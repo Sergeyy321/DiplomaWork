@@ -1,18 +1,13 @@
 
 import './App.css';
-import Header from './Components/Header/Header';
+import Header from './Components/Header/Header';  
+import Registration from './Components/Registration/Registration';
 
-function App() {
-  return (
-    <div className="App">
-
-   
-     
-
-
-    </div>
-   
-  );
-}
+const App = () => {
+return(  <div>
+  <Header />
+  <Registration />
+</div>)
+};
 
 export default App;
