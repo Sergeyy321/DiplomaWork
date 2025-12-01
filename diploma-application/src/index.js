@@ -15,3 +15,11 @@ root.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+function squareDigits(num) {
+  let result = ''
+  for (let i = 0; i <= num.toString().length; i++) {
+    result = result + (Number(num.toString()[i]) * Number(num.toString()[i])).toString()
+
+  }
+  return console.log(Number(result))
+}
