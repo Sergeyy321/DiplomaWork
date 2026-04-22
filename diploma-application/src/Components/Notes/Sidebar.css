@@ -1,0 +1,104 @@
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background: #111827;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* меню */
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* кнопка */
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  width: 100%;
+  padding: 10px 12px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: transparent;
+  color: #d1d5db;
+
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+/* hover */
+.menu-item:hover {
+  background: #1f2937;
+  color: white;
+}
+
+/* active */
+.menu-item.active {
+  background: #2563eb;
+  color: white;
+}
+
+/* logout */
+.logout {
+  margin-top: auto;
+
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+
+  background: #1f2937;
+  color: white;
+
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.logout:hover {
+  background: #374151;
+}
+/* обгортка для hover */
+.menu-wrapper {
+  position: relative;
+}
+
+/* dropdown прихований */
+.dropdown {
+  display: none;
+  flex-direction: column;
+  margin-left: 30px;
+  margin-top: 5px;
+  gap: 5px;
+}
+
+/* показ при hover */
+.menu-wrapper:hover .dropdown {
+  display: flex;
+}
+
+/* елементи нотаток */
+.dropdown-item {
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.dropdown-item:hover {
+  background: #1f2937;
+  color: white;
+}
