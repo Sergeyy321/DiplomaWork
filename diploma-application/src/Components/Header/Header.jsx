@@ -8,7 +8,7 @@ function Header() {
         <div className="App">
             {counter}
             
-      <p>Welcome to the Diploma Application </p>
+      {/* <p>Welcome to the Diploma Application </p> */}
   
         </div>
    
