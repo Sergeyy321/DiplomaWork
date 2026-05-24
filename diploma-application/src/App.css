@@ -36,3 +36,25 @@
     transform: rotate(360deg);
   }
 }
+
+.premium-calendar-wrapper .react-calendar {
+  width: 100% !important;
+  border: none !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.react-calendar__tile {
+  padding: 12px 8px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 90px;
+  border: 1px solid #f3f4f6 !important;
+}
+
+.react-calendar__month-view__days {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+}

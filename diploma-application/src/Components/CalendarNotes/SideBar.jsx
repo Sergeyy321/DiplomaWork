@@ -25,7 +25,7 @@ export default function Sidebar({ folders, activeFolder, setActiveFolder, onCrea
         </div>
       </div>
 
-      {/* Дефолтная кнопка создания заметки */}
+   
       <button 
         onClick={onCreateNote}
         style={{
@@ -34,7 +34,7 @@ export default function Sidebar({ folders, activeFolder, setActiveFolder, onCrea
           display: "flex", alignItems: "center", justifyContent: "center", gap: "8px"
         }}
       >
-        <span>📝</span> Новая заметка
+        <span>📝</span> New note
       </button>
     </div>
   );

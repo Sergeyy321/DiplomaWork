@@ -4,7 +4,7 @@ import Calendar from "react-calendar";
 export default function CalendarView({ date, setDate, events }) {
   return (
     <div style={{ flex: 1, background: "#fff", padding: "20px", borderRadius: "12px", boxShadow: "0 4px 6px rgba(0,0,0,0.05)" }}>
-      <h2 style={{ marginTop: 0 }}>Календарь задач</h2>
+      <h2 style={{ marginTop: 0 }}>Task calendar</h2>
       <Calendar
         onChange={setDate}
         value={date}

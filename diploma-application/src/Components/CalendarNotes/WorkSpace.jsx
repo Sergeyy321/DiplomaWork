@@ -6,17 +6,17 @@ import DayMindMap from "./DayMindMap";
 export default function Workspace() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [folders, setFolders] = useState([
-    { id: "work", title: "Работа", icon: "💼" },
-    { id: "personal", title: "Личное", icon: "🏠" }
+    { id: "work", title: "Work", icon: "💼" },
+    { id: "personal", title: "Personal", icon: "🏠" }
   ]);
   const [activeFolder, setActiveFolder] = useState("work");
   const [events, setEvents] = useState([
-    { id: 1, folderId: "work", title: "Созвон по диплому", time: "15:00", date: new Date().toISOString().split("T")[0], color: "blue" },
-    { id: 2, folderId: "work", title: "Поправить баг с CSS", time: "18:00", date: new Date().toISOString().split("T")[0], color: "red" }
+    { id: 1, folderId: "work", title: "Meeting about the diploma", time: "15:00", date: new Date().toISOString().split("T")[0], color: "blue" },
+    { id: 2, folderId: "work", title: "Fix CSS bug", time: "18:00", date: new Date().toISOString().split("T")[0], color: "red" }
   ]);
 
   const createQuickNote = () => {
-    const title = prompt("Введите название заметки:");
+    const title = prompt("Enter note title:");
     if (!title) return;
     
     setEvents([...events, {

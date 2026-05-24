@@ -8,16 +8,16 @@ export default function DayMindMap({ date, events }) {
       <h3 style={{ marginTop: 0, width: "100%", textAlign: "left" }}>Майнд-карта дня</h3>
       
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", width: "100%" }}>
-        {/* Центральный узел */}
+   
         <div style={{ width: "80px", height: "80px", borderRadius: "50%", background: "#4f46e5", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", zIndex: 2, textAlign: "center", fontSize: "14px" }}>
           {formattedDate}
         </div>
 
-        {/* Лучи заметок */}
+  
         {events.map((event, index) => {
-          // Вычисляем угол для каждого луча, чтобы они распределялись по кругу
+  
           const angle = (index * 360) / events.length;
-          const radius = 110; // Длина луча
+          const radius = 110; 
           const x = Math.cos((angle * Math.PI) / 180) * radius;
           const y = Math.sin((angle * Math.PI) / 180) * radius;
 
@@ -42,7 +42,7 @@ export default function DayMindMap({ date, events }) {
           );
         })}
 
-        {/* Если заметок нет */}
+   
         {events.length === 0 && (
           <p style={{ position: "absolute", color: "#9ca3af", fontSize: "14px" }}>На сегодня заметок нет</p>
         )}
