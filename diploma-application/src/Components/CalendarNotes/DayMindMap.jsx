@@ -37,7 +37,7 @@ export default function DayMindMap({ date, events }) {
                 zIndex: 3
               }}
             >
-              📌 {event.time} {event.title}
+              {event.time ? `📌 ${event.time} ${event.title}` : `📌 ${event.title}`}
             </div>
           );
         })}

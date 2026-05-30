@@ -38,16 +38,45 @@ export default function CalendarNote() {
     }
   ]);
 
+  // Load events from localStorage on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("calendar_events_v1");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        // restore Date objects for fullDate if present
+        const restored = parsed.map(e => ({ ...e, fullDate: e.fullDate ? new Date(e.fullDate) : null }));
+        setEvents(restored);
+      }
+    } catch (err) {
+      console.warn("Failed to load events from localStorage:", err);
+    }
+  }, []);
+
+  // Persist events to localStorage whenever they change
+  useEffect(() => {
+    try {
+      const safe = events.map(e => ({ ...e, fullDate: e.fullDate ? (e.fullDate instanceof Date ? e.fullDate.toISOString() : e.fullDate) : null }));
+      localStorage.setItem("calendar_events_v1", JSON.stringify(safe));
+    } catch (err) {
+      console.warn("Failed to save events to localStorage:", err);
+    }
+  }, [events]);
+
   const [isOpen, setIsOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [activeTab, setActiveTab] = useState("calendar"); 
   const [aiTargetNote, setAiTargetNote] = useState(null);
+  const [noteSearch, setNoteSearch] = useState("");
+  const [noteFilter, setNoteFilter] = useState("all");
+  const [hoverFilter, setHoverFilter] = useState("");
 
   const [form, setForm] = useState({
-    title: "", content: "", time: "12:00", color: "#4f46e5",
+    title: "", content: "", time: "", color: "#4f46e5",
     fontStyle: "sans-serif", isBold: false, isItalic: false, align: "left", reminder: false,
+    assignDate: false, assignTime: false,
   });
 
   const [editingId, setEditingId] = useState(null);
@@ -160,16 +189,30 @@ export default function CalendarNote() {
   const handleDateClick = (date) => {
     setSelectedDate(date);
     setEditingId(null);
-    setForm({ title: "", content: "", time: "12:00", color: "#4f46e5", fontStyle: "sans-serif", isBold: false, isItalic: false, align: "left", reminder: false });
+    setForm({ title: "", content: "", time: "", color: "#4f46e5", fontStyle: "sans-serif", isBold: false, isItalic: false, align: "left", reminder: false, assignDate: true, assignTime: false });
+    setIsOpen(true);
+  };
+
+  const handleQuickCompose = () => {
+    // Open composer without date/time by default
+    setSelectedDate(null);
+    setEditingId(null);
+    setForm({ title: "", content: "", time: "", color: "#4f46e5", fontStyle: "sans-serif", isBold: false, isItalic: false, align: "left", reminder: false, assignDate: false, assignTime: false });
     setIsOpen(true);
   };
 
   const handleSubmit = () => {
-    const targetDate = selectedDate || date;
-    const dateString = targetDate.toISOString().split("T")[0];
+    let dateString = "";
+    if (form.assignDate) {
+      const targetDate = selectedDate || date;
+      dateString = targetDate.toISOString().split("T")[0];
+    }
+
+    // Reminders require both date and time; disable if not provided
+    const reminderToSave = form.reminder && form.assignDate && form.assignTime ? true : false;
 
     if (editingId) {
-      setEvents(events.map(e => e.id === editingId ? { ...e, ...form } : e));
+      setEvents(events.map(e => e.id === editingId ? { ...e, ...form, reminder: reminderToSave, date: dateString || "" } : e));
     } else {
       const angle = Math.random() * Math.PI * 2;
       const radius = 130 + Math.random() * 40;
@@ -179,10 +222,11 @@ export default function CalendarNote() {
           id: Date.now(),
           folderId: activeFolder,
           date: dateString,
-          fullDate: targetDate,
+          fullDate: form.assignDate ? (selectedDate || date) : null,
           x: Math.cos(angle) * radius,
           y: Math.sin(angle) * radius,
           ...form,
+          reminder: reminderToSave,
         },
       ]);
     }
@@ -197,9 +241,9 @@ export default function CalendarNote() {
   };
 
   const editNotification = (event) => {
-    setSelectedDate(new Date(event.date));
+    setSelectedDate(event.date ? new Date(event.date) : null);
     setEditingId(event.id);
-    setForm({ title: event.title, content: event.content || "", time: event.time, color: event.color, fontStyle: event.fontStyle || "sans-serif", isBold: event.isBold || false, isItalic: event.isItalic || false, align: event.align || "left", reminder: event.reminder || false });
+    setForm({ title: event.title, content: event.content || "", time: event.time || "", color: event.color, fontStyle: event.fontStyle || "sans-serif", isBold: event.isBold || false, isItalic: event.isItalic || false, align: event.align || "left", reminder: event.reminder || false, assignDate: !!event.date, assignTime: !!event.time });
     setIsOpen(true);
   };
 
@@ -227,6 +271,26 @@ export default function CalendarNote() {
   const filteredEvents = events.filter((e) => e.folderId === activeFolder);
   const selectedDateStr = date.toISOString().split("T")[0];
   const dayEventsForMindMap = filteredEvents.filter((e) => e.date === selectedDateStr);
+
+  const normalizedSearch = noteSearch.trim().toLowerCase();
+  const searchMatchedEvents = filteredEvents.filter((e) => {
+    const haystack = `${e.title || ""} ${e.content || ""} ${e.date || ""} ${e.time || ""}`.toLowerCase();
+    return !normalizedSearch || haystack.includes(normalizedSearch);
+  });
+
+  const allCount = searchMatchedEvents.length;
+  const datedCount = searchMatchedEvents.filter((e) => e.date && e.time).length;
+  const timelessCount = searchMatchedEvents.filter((e) => !e.date && !e.time).length;
+
+  const filteredNotes = searchMatchedEvents.filter((e) => {
+    if (noteFilter === "dated") {
+      return !!e.date && !!e.time;
+    }
+    if (noteFilter === "timeless") {
+      return !e.date && !e.time;
+    }
+    return true;
+  });
 
   return (
     <div style={workspaceContainer}>
@@ -267,7 +331,7 @@ export default function CalendarNote() {
           </div>
         </div>
 
-        <button onClick={() => handleDateClick(date)} style={quickNoteButton}>
+        <button onClick={handleQuickCompose} style={quickNoteButton}>
           <span>📝</span> Compose Note
         </button>
       </div>
@@ -284,6 +348,9 @@ export default function CalendarNote() {
             </button>
             <button onClick={() => setActiveTab("ai-analyzer")} style={{ ...tabButton, background: activeTab === "ai-analyzer" ? "#10b981" : "#e5e7eb", color: activeTab === "ai-analyzer" ? "white" : "#374151" }}>
               ✨ AI Insights Suite
+            </button>
+            <button onClick={() => setActiveTab("notes")} style={{ ...tabButton, background: activeTab === "notes" ? "#f59e0b" : "#e5e7eb", color: activeTab === "notes" ? "white" : "#374151" }}>
+              🗂️ Notes
             </button>
           </div>
           <div style={statusBadge}>
@@ -304,7 +371,7 @@ export default function CalendarNote() {
                     {dayEvents.map(event => (
                       <div key={event.id} onClick={(e) => { e.stopPropagation(); setSelectedEvent(event); setIsPreviewOpen(true); }} style={{ ...calendarInlineNoteBadge, background: `${event.color}15`, borderLeft: `3px solid ${event.color}`, color: "#1f2937" }}>
                         <span style={{ fontFamily: event.fontStyle, fontWeight: event.isBold ? "700" : "400", fontStyle: event.isItalic ? "italic" : "normal", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {event.time} {event.title}
+                          {event.time ? `${event.time} ${event.title}` : event.title}
                         </span>
                       </div>
                     ))}
@@ -338,7 +405,7 @@ export default function CalendarNote() {
                     style={{ ...mindMapNode, transform: `translate(calc(-50% + ${event.x}px), calc(-50% + ${event.y}px))`, borderLeft: `5px solid ${event.color}`, cursor: dragNodeId.current === event.id ? "grabbing" : "grab" }}
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", gap: "10px" }}>
-                      <span style={{ fontWeight: "700", color: "#6b7280", fontSize: "11px" }}>{event.time} {event.reminder && "🔔"}</span>
+                      <span style={{ fontWeight: "700", color: "#6b7280", fontSize: "11px" }}>{event.time ? `${event.time} ${event.reminder ? "🔔" : ""}` : (event.reminder ? "🔔" : "")}</span>
                       <span style={{ fontSize: "10px", opacity: 0.4 }}>✥ Drag</span>
                     </div>
                     <div style={{ textOverflow: "ellipsis", overflow: "hidden", maxWidth: "140px", fontFamily: event.fontStyle, fontWeight: event.isBold ? "bold" : "normal", fontStyle: event.isItalic ? "italic" : "normal", color: "#111827", marginTop: "2px" }}>{event.title}</div>
@@ -358,6 +425,80 @@ export default function CalendarNote() {
 
         {activeTab === "ai-analyzer" && (
           <AiAnalyzerSuite filteredEvents={filteredEvents} aiTargetNote={aiTargetNote} setAiTargetNote={setAiTargetNote} />
+        )}
+        {activeTab === "notes" && (
+          <div style={{ background: "#ffffff", borderRadius: "16px", padding: "20px", border: "1px solid #e5e7eb" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginBottom: "20px", alignItems: "center" }}>
+              <input
+                placeholder="Search all notes..."
+                value={noteSearch}
+                onChange={(e) => setNoteSearch(e.target.value)}
+                style={{ ...inputStyle, flex: 1, minWidth: "220px" }}
+              />
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  onClick={() => setNoteFilter("all")}
+                  onMouseEnter={() => setHoverFilter("all")}
+                  onMouseLeave={() => setHoverFilter("")}
+                  style={{ ...filterBtn, background: noteFilter === "all" ? "#4f46e5" : "#f3f4f6", color: noteFilter === "all" ? "white" : "#374151", position: "relative" }}
+                >
+                  All Notes
+                  {hoverFilter === "all" && (
+                    <span style={hoverBadge}>{allCount}</span>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNoteFilter("dated")}
+                  onMouseEnter={() => setHoverFilter("dated")}
+                  onMouseLeave={() => setHoverFilter("")}
+                  style={{ ...filterBtn, background: noteFilter === "dated" ? "#4f46e5" : "#f3f4f6", color: noteFilter === "dated" ? "white" : "#374151", position: "relative" }}
+                >
+                  Date & Time
+                  {hoverFilter === "dated" && (
+                    <span style={hoverBadge}>{datedCount}</span>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNoteFilter("timeless")}
+                  onMouseEnter={() => setHoverFilter("timeless")}
+                  onMouseLeave={() => setHoverFilter("")}
+                  style={{ ...filterBtn, background: noteFilter === "timeless" ? "#4f46e5" : "#f3f4f6", color: noteFilter === "timeless" ? "white" : "#374151", position: "relative" }}
+                >
+                  No Date/Time
+                  {hoverFilter === "timeless" && (
+                    <span style={hoverBadge}>{timelessCount}</span>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: "16px", color: "#6b7280", fontSize: "13px" }}>
+              Showing {filteredNotes.length} notes ({noteFilter === "all" ? "all types" : noteFilter === "dated" ? "with both date and time" : "without date and time"}).
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "12px" }}>
+              {filteredNotes.length > 0 ? filteredNotes.map(e => (
+                <div key={e.id} style={{ padding: "12px", borderRadius: "10px", border: "1px solid #f3f4f6", background: "#fff" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ fontWeight: 700, marginBottom: "6px" }}>{e.title || "Untitled"}</div>
+                    <div style={{ fontSize: "12px", color: "#6b7280" }}>{e.date && e.time ? `${e.date} ${e.time}` : e.date ? e.date : e.time ? e.time : "—"}</div>
+                  </div>
+                  <div style={{ fontSize: "13px", color: "#374151", minHeight: "36px" }}>{e.content ? (e.content.slice(0, 120) + (e.content.length > 120 ? "..." : "")) : <em style={{ color: "#9ca3af" }}>No body text</em>}</div>
+                  <div style={{ display: "flex", gap: "8px", marginTop: "10px", justifyContent: "flex-end" }}>
+                    <button onClick={() => { setSelectedEvent(e); setIsPreviewOpen(true); }} style={{ ...actionBtn, background: "#e5e7eb", color: "#374151" }}>View</button>
+                    <button onClick={() => editNotification(e)} style={{ ...actionBtn, background: "#d1fae5", color: "#065f46" }}>Edit</button>
+                  </div>
+                </div>
+              )) : (
+                <div style={{ gridColumn: "1 / -1", color: "#9ca3af", padding: "16px", background: "#f8fafc", borderRadius: "12px" }}>
+                  No notes match the current search and filter.
+                </div>
+              )}
+            </div>
+          </div>
         )}
       </div>
 
@@ -386,10 +527,23 @@ export default function CalendarNote() {
 
             <textarea placeholder="Write your logs or canvas data here..." value={form.content} style={{ ...textareaStyle, fontFamily: form.fontStyle, fontWeight: form.isBold ? "bold" : "normal", fontStyle: form.isItalic ? "italic" : "normal", textAlign: form.align, borderTop: `4px solid ${form.color}` }} onChange={(e) => setForm({ ...form, content: e.target.value })} />
 
-            <div style={{ display: "flex", gap: "15px" }}>
-              <input type="time" value={form.time} style={{ ...inputStyle, flex: 1 }} onChange={(e) => setForm({ ...form, time: e.target.value })} />
-              <label style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer", color: "#374151", flex: 1 }}>
-                <input type="checkbox" checked={form.reminder} onChange={(e) => setForm({ ...form, reminder: e.target.checked })} /> Push Notification
+            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", color: "#374151" }}>
+                <input type="checkbox" checked={form.assignDate} onChange={(e) => { const assign = e.target.checked; setForm({ ...form, assignDate: assign }); if (!assign) setSelectedDate(null); }} /> Assign Date
+              </label>
+              {form.assignDate && (
+                <input type="date" value={(selectedDate || date).toISOString().split("T")[0]} style={{ ...inputStyle, width: "160px" }} onChange={(e) => setSelectedDate(new Date(e.target.value))} />
+              )}
+
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", color: "#374151" }}>
+                <input type="checkbox" checked={form.assignTime} onChange={(e) => setForm({ ...form, assignTime: e.target.checked, time: e.target.checked ? form.time : "" })} /> Assign Time
+              </label>
+              {form.assignTime && (
+                <input type="time" value={form.time} style={{ ...inputStyle, width: "140px" }} onChange={(e) => setForm({ ...form, time: e.target.value })} />
+              )}
+
+              <label style={{ display: "flex", alignItems: "center", gap: "6px", cursor: form.assignDate && form.assignTime ? "pointer" : "not-allowed", color: "#374151", marginLeft: "auto" }}>
+                <input type="checkbox" checked={form.reminder} disabled={!(form.assignDate && form.assignTime)} onChange={(e) => setForm({ ...form, reminder: e.target.checked })} /> Push Notification
               </label>
             </div>
 
@@ -406,10 +560,10 @@ export default function CalendarNote() {
         <div style={fullscreenOverlay}>
           <div style={fullscreenContentCard}>
             <div style={previewHeader}>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                 <div style={{ width: "16px", height: "16px", borderRadius: "50%", background: selectedEvent.color }} />
-                <span style={{ fontSize: "14px", color: "#6b7280", fontWeight: "600" }}>⏰ {selectedEvent.time}</span>
-                <span style={{ background: "#f3f4f6", padding: "2px 8px", borderRadius: "12px", fontSize: "12px", color: "#4b5563" }}>{selectedEvent.date}</span>
+                {selectedEvent.time && <span style={{ fontSize: "14px", color: "#6b7280", fontWeight: "600" }}>⏰ {selectedEvent.time}</span>}
+                {selectedEvent.date && <span style={{ background: "#f3f4f6", padding: "2px 8px", borderRadius: "12px", fontSize: "12px", color: "#4b5563" }}>{selectedEvent.date}</span>}
               </div>
               <div style={{ display: "flex", gap: "10px" }}>
                 <button onClick={() => triggerAiRouting(selectedEvent)} style={{ ...actionBtn, background: "#d1fae5", color: "#065f46", border: "1px solid #10b981" }} >✨ Analyze with AI</button>
@@ -466,6 +620,8 @@ const selectTool = { padding: "4px 8px", border: "1px solid #e5e7eb", borderRadi
 const inputStyle = { width: "100%", padding: "12px 16px", borderRadius: "10px", border: "1px solid #d1d5db", boxSizing: "border-box", fontSize: "15px", outline: "none" };
 const textareaStyle = { width: "100%", minHeight: "160px", padding: "16px", borderRadius: "10px", border: "1px solid #d1d5db", boxSizing: "border-box", fontSize: "15px", outline: "none", resize: "vertical", lineHeight: "1.5" };
 const actionBtn = { padding: "12px 24px", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "600", fontSize: "14px" };
+const filterBtn = { border: "1px solid #e5e7eb", borderRadius: "10px", padding: "10px 14px", cursor: "pointer", fontWeight: "600", minWidth: "120px", whiteSpace: "nowrap" };
+const hoverBadge = { position: "absolute", top: "-8px", right: "-8px", background: "#f59e0b", color: "white", borderRadius: "999px", padding: "4px 8px", fontSize: "11px", fontWeight: "700", boxShadow: "0 1px 4px rgba(0,0,0,0.12)" };
 const fullscreenOverlay = { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "#ffffff", zIndex: 1000, display: "flex", justifyContent: "center", overflowY: "auto" };
 const fullscreenContentCard = { width: "100%", maxWidth: "800px", padding: "60px 24px", display: "flex", flexDirection: "column" };
 const previewHeader = { display: "flex", justifyContent: "space-between", alignItems: "center", background: "#f9fafb", padding: "16px 24px", borderRadius: "14px", border: "1px solid #e5e7eb" };

@@ -23,7 +23,7 @@ export default function Workspace() {
       id: Date.now(),
       folderId: activeFolder,
       title: title,
-      time: "12:00",
+      time: "",
       date: currentDate.toISOString().split("T")[0],
       color: "green"
     }]);

@@ -105,7 +105,7 @@ export default function AiAnalyzerSuite({ filteredEvents, aiTargetNote, setAiTar
                 <div style={{ fontWeight: "600", fontSize: "13px", color: "#111827", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
                   {e.title || "Untitled Note"}
                 </div>
-                <div style={{ fontSize: "11px", color: "#6b7280" }}>🕒 {e.time}</div>
+                {e.time ? <div style={{ fontSize: "11px", color: "#6b7280" }}>🕒 {e.time}</div> : null}
               </div>
             ))}
             {filteredEvents.length === 0 && (
