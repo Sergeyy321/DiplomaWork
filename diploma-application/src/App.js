@@ -1,24 +1,20 @@
-
+import React from 'react';
 import './App.css';
-import Header from './Components/Header/Header';
-import Sidebar from './Components/Notes/Sidebar';
+import CalendarNote from './Components/CalendarNotes/CalendarNotes';
+import Header from './Components/Header/Header';  
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-
-   
-     
+    <div style={{ minHeight: "100vh", background: "#f3f4f6", display: "flex", flexDirection: "column" }}>
 
       <Header />
       
-      <Sidebar />
-       <main className="ml-64 p-6">
-        <h1>Контент</h1>
-      </main>
+
+      <div style={{ flex: 1 }}>
+        <CalendarNote />
+      </div>
     </div>
-   
   );
-}
+};
 
 export default App;
