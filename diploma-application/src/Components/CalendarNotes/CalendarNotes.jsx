@@ -320,14 +320,13 @@ export default function CalendarNote() {
 
         {activeTab === "calendar" && (
           <CalendarDashboard
-            date={date}
-            setDate={setDate}
-            filteredEvents={filteredEvents}
-            setEvents={setEvents}
-            handleDateClick={handleDateClick}
-            setSelectedEvent={setSelectedEvent}
-            setIsPreviewOpen={setIsPreviewOpen}
-            deleteNotification={deleteNotification}
+date={date}
+    setDate={setDate}
+    allEvents={events}
+    setEvents={setEvents}
+    setSelectedEvent={setSelectedEvent}
+    setIsPreviewOpen={setIsPreviewOpen}
+    deleteNotification={deleteNotification}
           />
         )}
 

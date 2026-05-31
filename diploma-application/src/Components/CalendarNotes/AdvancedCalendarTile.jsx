@@ -4,8 +4,7 @@ export default function AdvancedCalendarTile({
   tileDate, 
   dayEvents, 
   setSelectedEvent, 
-  setIsPreviewOpen, 
-  deleteNotification
+  setIsPreviewOpen 
 }) {
   const dateStr = tileDate.toISOString().split("T")[0];
 
@@ -16,63 +15,63 @@ export default function AdvancedCalendarTile({
   };
 
   return (
-    <div 
-      style={tileWrapper} 
-      data-date={dateStr}
-      onDragOver={(e) => e.preventDefault()} // Let individual tiles capture item tracking directly
-    >
+    <div style={tileWrapper} data-date={dateStr}>
       <div style={tileNotesScrollArea}>
         {dayEvents.map((event) => (
-          <div
-            key={event.id}
-            draggable
-            onDragStart={(e) => handleDragStart(e, event.id)}
-            onClick={(e) => {
-              e.stopPropagation();
-              setSelectedEvent(event);
-              setIsPreviewOpen(true);
-            }}
-            style={{
-              ...modernInlineBadge,
-              background: `${event.color}12`,
-              borderLeft: `4px solid ${event.color}`,
-            }}
-            title="Drag node to reschedule"
-          >
-            {/* pointerEvents: 'none' stops child layouts from blocking HTML5 transfers */}
-            <span style={{ ...badgeTime, pointerEvents: "none" }}>{event.time}</span>
-            <span style={{ ...badgeText, pointerEvents: "none" }}>{event.title}</span>
-            <button
-              style={miniQuickDeleteBtn}
+          <div key={event.id} style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+            {/* Primary Document Header Card */}
+            <div
+              draggable
+              onDragStart={(e) => handleDragStart(e, event.id)}
               onClick={(e) => {
                 e.stopPropagation();
-                deleteNotification(event.id);
+                setSelectedEvent(event);
+                setIsPreviewOpen(true);
               }}
+              style={{
+                ...modernInlineBadge,
+                background: `${event.color}14`,
+                borderLeft: `3px solid ${event.color}`,
+              }}
+              title="Drag node to reschedule"
             >
-              ✕
-            </button>
+              <span style={{ ...badgeTime, pointerEvents: "none" }}>{event.time}</span>
+              <span style={{ ...badgeText, pointerEvents: "none" }}>{event.title}</span>
+            </div>
+
+            {/* Shared Tasks List rendering inside the calendar card */}
+            {event.tasks && event.tasks.length > 0 && (
+              <div style={tileInlineTaskList}>
+                {event.tasks.map((task) => (
+                  <div key={task.id} style={tileInlineTaskRow}>
+                    <span style={{ 
+                      ...miniTaskDot, 
+                      background: task.completed ? "#9ca3af" : event.color 
+                    }} />
+                    <span style={{ 
+                      ...tileTaskText,
+                      textDecoration: task.completed ? "line-through" : "none",
+                      opacity: task.completed ? 0.5 : 1
+                    }}>
+                      {task.text}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>
-
-      {dayEvents.length > 0 && (
-        <div style={modernMatrixIndicator}>
-          {dayEvents.slice(0, 4).map((e) => (
-            <span key={e.id} style={{ ...miniDot, background: e.color }} />
-          ))}
-          {dayEvents.length > 4 && <span style={plusMoreIndicator}>+{dayEvents.length - 4}</span>}
-        </div>
-      )}
     </div>
   );
 }
 
-const tileWrapper = { display: "flex", flexDirection: "column", height: "100%", justifyContent: "space-between", minHeight: "75px", padding: "2px", boxSizing: "border-box", position: "relative" };
-const tileNotesScrollArea = { display: "flex", flexDirection: "column", gap: "4px", overflowY: "auto", maxHeight: "56px", paddingRight: "2px", width: "100%" };
-const modernInlineBadge = { fontSize: "11px", borderRadius: "6px", padding: "3px 6px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "4px", cursor: "grab", position: "relative", overflow: "hidden" };
-const badgeTime = { fontWeight: "700", opacity: 0.7, fontSize: "10px", whiteSpace: "nowrap" };
-const badgeText = { flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "left" };
-const miniQuickDeleteBtn = { background: "none", border: "none", color: "#9ca3af", cursor: "pointer", fontSize: "9px", padding: "2px", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 };
-const modernMatrixIndicator = { display: "flex", gap: "3px", alignItems: "center", justifyContent: "flex-start", paddingTop: "2px", marginTop: "auto", pointerEvents: "none" };
-const miniDot = { width: "5px", height: "5px", borderRadius: "50%" };
-const plusMoreIndicator = { fontSize: "9px", color: "#9ca3af", fontWeight: "700" };
+const tileWrapper = { display: "flex", flexDirection: "column", height: "100%", width: "100%", justifyContent: "flex-start", minHeight: "85px", padding: "4px", boxSizing: "border-box", position: "relative" };
+const tileNotesScrollArea = { display: "flex", flexDirection: "column", gap: "6px", overflowY: "auto", maxHeight: "75px", width: "100%" };
+const modernInlineBadge = { fontSize: "10px", borderRadius: "4px", padding: "2px 4px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "2px", cursor: "grab", zIndex: 10 };
+const badgeTime = { fontWeight: "700", opacity: 0.8, fontSize: "9px", whiteSpace: "nowrap" };
+const badgeText = { flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "left", marginLeft: "2px", fontWeight: "600" };
+const tileInlineTaskList = { display: "flex", flexDirection: "column", gap: "2px", marginTop: "4px", paddingLeft: "6px" };
+const tileInlineTaskRow = { display: "flex", alignItems: "center", gap: "4px", width: "100%" };
+const miniTaskDot = { width: "4px", height: "4px", borderRadius: "50%", flexShrink: 0 };
+const tileTaskText = { fontSize: "9px", color: "#4b5563", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "left" };
