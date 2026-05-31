@@ -61,10 +61,10 @@ export default function CalendarNote() {
     }
   ]);
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  // 🌟 CONSOLIDATED STATE ARTIFACTS
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [editingId, setEditingId] = useState(null);
   const [activeTab, setActiveTab] = useState("calendar"); 
   const [aiTargetNote, setAiTargetNote] = useState(null);
 
@@ -73,7 +73,6 @@ export default function CalendarNote() {
     fontStyle: "sans-serif", isBold: false, isItalic: false, align: "left", reminder: false,
   });
 
-  const [editingId, setEditingId] = useState(null);
   const dragNodeId = useRef(null);
   const dragStartPos = useRef({ x: 0, y: 0 });
 
@@ -162,7 +161,6 @@ export default function CalendarNote() {
     if (!newFolderTitle.trim()) return;
     const newId = `folder_${Date.now()}`;
     
-    // Dynamic Lucide assignment based on dropdown values
     let iconComponent = <Folder size={16} />;
     if (newFolderIcon === "work") iconComponent = <Briefcase size={16} />;
     if (newFolderIcon === "personal") iconComponent = <Home size={16} />;
@@ -179,50 +177,72 @@ export default function CalendarNote() {
     setFolders(folders.filter((f) => f.id !== id));
   };
   
+  // 🌟 TRIGGER MODAL FRAMEWORK FOR CREATION PASSES
   const handleDateClick = (date) => {
     setSelectedDate(date);
     setEditingId(null);
     setForm({ title: "", content: "", time: "12:00", color: "#4f46e5", fontStyle: "sans-serif", isBold: false, isItalic: false, align: "left", reminder: false });
-    setIsOpen(true);
+    setIsModalOpen(true);
   };
 
-  const handleSubmit = () => {
-    const targetDate = selectedDate || date;
-    const dateString = targetDate.toISOString().split("T")[0];
-
-    if (editingId) {
-      setEvents(events.map(e => e.id === editingId ? { ...e, ...form } : e));
-    } else {
-      const angle = Math.random() * Math.PI * 2;
-      const radius = 130 + Math.random() * 40;
-      setEvents([
-        ...events,
-        {
-          id: Date.now(),
-          folderId: activeFolder,
-          date: dateString,
-          fullDate: targetDate,
-          x: Math.cos(angle) * radius,
-          y: Math.sin(angle) * radius,
-          ...form,
-        },
-      ]);
-    }
-    setIsOpen(false);
-    setEditingId(null);
+  // 🌟 TRIGGER MODAL FRAMEWORK FOR MODIFICATION PASSES
+  const handleSelectExistingNote = (event) => {
+    setSelectedDate(new Date(event.date));
+    setEditingId(event.id);
+    setForm({ 
+      title: event.title, 
+      content: event.content || "", 
+      time: event.time, 
+      color: event.color, 
+      fontStyle: event.fontStyle || "sans-serif", 
+      isBold: event.isBold || false, 
+      isItalic: event.isItalic || false, 
+      align: event.align || "left", 
+      reminder: event.reminder || false 
+    });
+    setIsModalOpen(true);
   };
+
+const handleSubmit = () => {
+  // Defensive validation: ensure we fall back to a guaranteed valid date object
+  let targetDate = selectedDate;
+  
+  if (!targetDate || isNaN(new Date(targetDate).getTime())) {
+    targetDate = date || new Date();
+  }
+
+  // Ensure it's treated as a clean JavaScript Date object
+  const validDateObject = new Date(targetDate);
+  const dateString = validDateObject.toISOString().split("T")[0];
+
+  if (editingId) {
+    setEvents(events.map(e => e.id === editingId ? { ...e, ...form, date: dateString } : e));
+  } else {
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 130 + Math.random() * 40;
+    setEvents([
+      ...events,
+      {
+        id: Date.now(),
+        folderId: activeFolder,
+        date: dateString,
+        fullDate: validDateObject,
+        x: Math.cos(angle) * radius,
+        y: Math.sin(angle) * radius,
+        ...form,
+      },
+    ]);
+  }
+  
+  setIsModalOpen(false);
+  setEditingId(null);
+  setSelectedDate(null); // Clean up state memory for the next note creation cycle
+};
 
   const deleteNotification = (id) => {
     setEvents(events.filter((e) => e.id !== id));
-    if (selectedEvent?.id === id) setIsPreviewOpen(false);
+    setIsModalOpen(false);
     if (aiTargetNote?.id === id) setAiTargetNote(null);
-  };
-
-  const editNotification = (event) => {
-    setSelectedDate(new Date(event.date));
-    setEditingId(event.id);
-    setForm({ title: event.title, content: event.content || "", time: event.time, color: event.color, fontStyle: event.fontStyle || "sans-serif", isBold: event.isBold || false, isItalic: event.isItalic || false, align: event.align || "left", reminder: event.reminder || false });
-    setIsOpen(true);
   };
 
   const onNodeMouseDown = (e, id, currentX, currentY) => {
@@ -240,9 +260,18 @@ export default function CalendarNote() {
 
   const onCanvasMouseUp = () => { dragNodeId.current = null; };
 
-  const triggerAiRouting = (event) => {
-    setAiTargetNote(event);
-    setIsPreviewOpen(false);
+  const triggerAiRouting = () => {
+    // Package current form configurations into note context format
+    const temporaryNotePayload = {
+      id: editingId || Date.now(),
+      title: form.title,
+      content: form.content,
+      time: form.time,
+      color: form.color,
+      date: (selectedDate || date).toISOString().split("T")[0],
+    };
+    setAiTargetNote(temporaryNotePayload);
+    setIsModalOpen(false);
     setActiveTab("ai-analyzer");
   };
 
@@ -320,13 +349,13 @@ export default function CalendarNote() {
 
         {activeTab === "calendar" && (
           <CalendarDashboard
-date={date}
-    setDate={setDate}
-    allEvents={events}
-    setEvents={setEvents}
-    setSelectedEvent={setSelectedEvent}
-    setIsPreviewOpen={setIsPreviewOpen}
-    deleteNotification={deleteNotification}
+            date={date}
+            setDate={setDate}
+            allEvents={events}
+            setEvents={setEvents}
+            handleDateClick={handleSelectExistingNote} // 🌟 Launches uniform modal with pre-filled content
+            setSelectedEvent={handleSelectExistingNote} // 🌟 Direct map to unified workflow interface
+            setIsPreviewOpen={setIsModalOpen}
           />
         )}
 
@@ -348,7 +377,7 @@ date={date}
                   <div 
                     onMouseDown={(e) => onNodeMouseDown(e, event.id, event.x, event.y)} 
                     onClick={(e) => e.stopPropagation()}
-                    onDoubleClick={() => {setSelectedEvent(event); setIsPreviewOpen(true);}}
+                    onDoubleClick={() => handleSelectExistingNote(event)}
                     style={{ ...mindMapNode, transform: `translate(calc(-50% + ${event.x}px), calc(-50% + ${event.y}px))`, borderLeft: `5px solid ${event.color}`, cursor: dragNodeId.current === event.id ? "grabbing" : "grab" }}
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", gap: "10px" }}>
@@ -379,73 +408,108 @@ date={date}
         )}
       </div>
 
-      {/* RICH TEXT COMPOSE MODAL */}
-      {isOpen && (
+      {/* =========================================================
+          🌟 UNIFIED MODAL COMPONENT (CREATE, READ & EDIT IN ONE)
+          ========================================================= */}
+      {isModalOpen && (
         <div style={overlayStyle}>
-          <div style={modalStyle}>
-            <h3 style={{ margin: 0, color: "#1f2937" }}>{editingId ? "Edit Document Parameters" : "Map New Thought Entry"}</h3>
-            <input placeholder="Document Title" value={form.title} style={inputStyle} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+          <div style={unifiedModalCard}>
+            
+            {/* Header Control panel */}
+            <div style={previewHeader}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{ width: "14px", height: "14px", borderRadius: "50%", background: form.color, border: "1px solid #cbd5e1" }} />
+                <span style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#4b5563", fontWeight: "700" }}>
+                  <Bell size={14} /> Scheduled: {form.time}
+                </span>
+              </div>
+              
+              <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                <button onClick={triggerAiRouting} style={{ ...actionBtn, display: "flex", alignItems: "center", gap: "6px", background: "#d1fae5", color: "#065f46", border: "1px solid #10b981" }}>
+                  <Cpu size={14} /> Analyze with AI
+                </button>
+                {editingId && (
+                  <button onClick={() => deleteNotification(editingId)} style={{ ...actionBtn, display: "flex", alignItems: "center", gap: "6px", background: "#fee2e2", color: "#dc2626" }}>
+                    <Trash2 size={14} /> Purge
+                  </button>
+                )}
+                <button onClick={() => setIsModalOpen(false)} style={{ ...actionBtn, display: "flex", alignItems: "center", gap: "6px", background: "#1f2937", color: "white" }}>
+                  <X size={14} /> Exit Screen
+                </button>
+              </div>
+            </div>
 
+            {/* Document Title Input Field Layer */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <label style={modalInputLabel}>DOCUMENT TITLE</label>
+              <input 
+                placeholder="Enter workspace document title..." 
+                value={form.title} 
+                style={inputStyle} 
+                onChange={(e) => setForm({ ...form, title: e.target.value })} 
+              />
+            </div>
+
+            {/* Custom Parameter Text Toolbar */}
             <div style={toolbarStyle}>
               <button type="button" style={{ ...toolBtn, background: form.isBold ? "#d1d5db" : "#f3f4f6", fontWeight: "bold" }} onClick={() => setForm({ ...form, isBold: !form.isBold })} >B</button>
               <button type="button" style={{ ...toolBtn, background: form.isItalic ? "#d1d5db" : "#f3f4f6", fontStyle: "italic" }} onClick={() => setForm({ ...form, isItalic: !form.isItalic })} >I</button>
+              
               <select value={form.fontStyle} style={selectTool} onChange={(e) => setForm({ ...form, fontStyle: e.target.value })} >
                 <option value="sans-serif">System Sans</option>
                 <option value="serif">Classic Serif</option>
                 <option value="monospace">Developer Code</option>
               </select>
+              
               <select value={form.align} style={selectTool} onChange={(e) => setForm({ ...form, align: e.target.value })} >
                 <option value="left">Align Left</option>
                 <option value="center">Align Center</option>
                 <option value="right">Align Right</option>
               </select>
-              <input type="color" value={form.color} style={{ width: "32px", height: "32px", border: "none", cursor: "pointer", padding: 0 }} onChange={(e) => setForm({ ...form, color: e.target.value })} />
+              
+              <input type="color" value={form.color} style={colorPickerTool} onChange={(e) => setForm({ ...form, color: e.target.value })} />
             </div>
 
-            <textarea placeholder="Write your logs or canvas data here..." value={form.content} style={{ ...textareaStyle, fontFamily: form.fontStyle, fontWeight: form.isBold ? "bold" : "normal", fontStyle: form.isItalic ? "italic" : "normal", textAlign: form.align, borderTop: `4px solid ${form.color}` }} onChange={(e) => setForm({ ...form, content: e.target.value })} />
+            {/* Framed Content Editor Panel Canvas */}
+            <div style={framedContentTextareaContainer}>
+              <div style={textareaHeaderLabel}>DOCUMENT REPOSITORY SPACE</div>
+              <textarea 
+                placeholder="Write down details, timeline logs, or custom notes here..." 
+                value={form.content} 
+                style={{ 
+                  ...editorModalTextarea, 
+                  fontFamily: form.fontStyle, 
+                  fontWeight: form.isBold ? "bold" : "normal", 
+                  fontStyle: form.isItalic ? "italic" : "normal", 
+                  textAlign: form.align,
+                  borderTop: `4px solid ${form.color}` 
+                }} 
+                onChange={(e) => setForm({ ...form, content: e.target.value })} 
+              />
+            </div>
 
-            <div style={{ display: "flex", gap: "15px" }}>
-              <input type="time" value={form.time} style={{ ...inputStyle, flex: 1 }} onChange={(e) => setForm({ ...form, time: e.target.value })} />
-              <label style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer", color: "#374151", flex: 1 }}>
-                <input type="checkbox" checked={form.reminder} onChange={(e) => setForm({ ...form, reminder: e.target.checked })} /> Push Notification
+            {/* System Metadata Configuration Layer */}
+            <div style={metaSettingsRow}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px", flex: 1 }}>
+                <label style={modalInputLabel}>EXECUTION TIME</label>
+                <input type="time" value={form.time} style={inputStyle} onChange={(e) => setForm({ ...form, time: e.target.value })} />
+              </div>
+              
+              <label style={checkboxSettingWrapper}>
+                <input type="checkbox" checked={form.reminder} onChange={(e) => setForm({ ...form, reminder: e.target.checked })} style={{ width: "16px", height: "16px" }} /> 
+                <div>
+                  <div style={{ fontWeight: "700", fontSize: "13px", color: "#111827" }}>Push Notification Trigger</div>
+                  <div style={{ fontSize: "11px", color: "#6b7280" }}>Enable real-time tab sound cues</div>
+                </div>
               </label>
             </div>
 
-            <div style={{ marginTop: 10, display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-              <button onClick={() => setIsOpen(false)} style={{ ...actionBtn, background: "#e5e7eb", color: "#374151" }}>Discard</button>
-              <button onClick={handleSubmit} style={{ ...actionBtn, background: "#4f46e5", color: "white" }}>Commit File</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* FULL-SCREEN READER VIEW MODAL */}
-      {isPreviewOpen && selectedEvent && (
-        <div style={fullscreenOverlay}>
-          <div style={fullscreenContentCard}>
-            <div style={previewHeader}>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <div style={{ width: "16px", height: "16px", borderRadius: "50%", background: selectedEvent.color }} />
-                <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "14px", color: "#6b7280", fontWeight: "600" }}>
-                  <Bell size={14} /> {selectedEvent.time}
-                </span>
-                <span style={{ background: "#f3f4f6", padding: "2px 8px", borderRadius: "12px", fontSize: "12px", color: "#4b5563" }}>{selectedEvent.date}</span>
-              </div>
-              <div style={{ display: "flex", gap: "10px" }}>
-                <button onClick={() => triggerAiRouting(selectedEvent)} style={{ ...actionBtn, display: "flex", alignItems: "center", gap: "6px", background: "#d1fae5", color: "#065f46", border: "1px solid #10b981" }} ><Cpu size={14} /> Analyze with AI</button>
-                <button onClick={() => { setIsPreviewOpen(false); editNotification(selectedEvent); }} style={{ ...actionBtn, display: "flex", alignItems: "center", gap: "6px", background: "#e5e7eb", color: "#1f2937" }} ><FileEdit size={14} /> Edit Document</button>
-                <button onClick={() => deleteNotification(selectedEvent.id)} style={{ ...actionBtn, display: "flex", alignItems: "center", gap: "6px", background: "#fee2e2", color: "#dc2626" }} ><Trash2 size={14} /> Purge</button>
-                <button onClick={() => setIsPreviewOpen(false)} style={{ ...actionBtn, display: "flex", alignItems: "center", gap: "6px", background: "#1f2937", color: "white" }} ><X size={14} /> Exit Screen</button>
-              </div>
+            {/* Direct Save Action Submission */}
+            <div style={formActionFooter}>
+              <button onClick={() => setIsModalOpen(false)} style={{ ...actionBtn, background: "#e5e7eb", color: "#374151" }}>Discard</button>
+              <button onClick={handleSubmit} style={{ ...actionBtn, background: "#4f46e5", color: "white", padding: "12px 32px" }}>Commit Changes</button>
             </div>
 
-            <div style={{ flex: 1, marginTop: "30px", display: "flex", flexDirection: "column", textAlign: selectedEvent.align, fontFamily: selectedEvent.fontStyle }}>
-              <h1 style={{ margin: "0 0 20px 0", fontSize: "32px", color: "#111827", fontWeight: selectedEvent.isBold ? "700" : "500", fontStyle: selectedEvent.isItalic ? "italic" : "normal" }}>{selectedEvent.title}</h1>
-              <hr style={{ border: "none", height: "1px", background: "#e5e7eb", marginBottom: "24px" }} />
-              <p style={{ fontSize: "18px", lineHeight: "1.7", color: "#374151", whiteSpace: "pre-wrap", fontWeight: selectedEvent.isBold ? "700" : "400", fontStyle: selectedEvent.isItalic ? "italic" : "normal" }}>
-                {selectedEvent.content || <em style={{ color: "#9ca3af" }}>No body text written for this note sheet.</em>}
-              </p>
-            </div>
           </div>
         </div>
       )}
@@ -453,6 +517,9 @@ date={date}
   );
 }
 
+// ==========================================
+// 🎨 UPDATED DESIGN STYLE VALUES
+// ==========================================
 const workspaceContainer = { display: "flex", height: "calc(100vh - 60px)", fontFamily: "'Inter', sans-serif", background: "#f9fafb" };
 const sidebarStyle = { width: "280px", background: "#111827", color: "#f9fafb", padding: "24px 20px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderRight: "1px solid #1f2937" };
 const sidebarTitle = { margin: 0, fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.06em", color: "#9ca3af", fontWeight: "700" };
@@ -470,21 +537,25 @@ const mainContentStyle = { flex: 1, padding: "32px", display: "flex", flexDirect
 const tabHeaderStyle = { display: "flex", justifyContent: "space-between", alignItems: "center" };
 const tabButton = { border: "none", padding: "12px 20px", borderRadius: "10px", fontWeight: "600", fontSize: "14px", cursor: "pointer", transition: "all 0.2s ease" };
 const statusBadge = { background: "#ffffff", padding: "8px 16px", borderRadius: "30px", fontSize: "13px", fontWeight: "600", color: "#4b5563", border: "1px solid #e5e7eb" };
-const calendarCard = { background: "#ffffff", padding: "24px", borderRadius: "20px", border: "1px solid #e5e7eb", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.02), 0 8px 10px -6px rgba(0,0,0,0.03)" };
-const tileContentContainer = { display: "flex", flexDirection: "column", gap: "3px", marginTop: "6px", width: "100%", minHeight: "45px", justifyContent: "flex-start", alignItems: "stretch" };
-const calendarInlineNoteBadge = { fontSize: "11px", borderRadius: "4px", padding: "3px 6px", textAlign: "left", display: "block", width: "100%", boxSizing: "border-box" };
 const mindMapCanvas = { flex: 1, background: "#ffffff", borderRadius: "20px", position: "relative", minHeight: "500px", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #e5e7eb", overflow: "hidden", userSelect: "none" };
 const canvasCenterNode = { width: "120px", height: "120px", borderRadius: "50%", background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)", color: "white", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", zIndex: 10, boxShadow: "0 20px 25px -5px rgba(79, 70, 229, 0.3)", textAlign: "center" };
 const mindMapNode = { position: "absolute", top: "50%", left: "50%", background: "#ffffff", padding: "14px 18px", borderRadius: "14px", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.08)", zIndex: 5, fontSize: "13px", display: "flex", flexDirection: "column", gap: "4px", whiteSpace: "nowrap", border: "1px solid #f3f4f6" };
 const emptyCanvasPrompt = { color: "#9ca3af", textAlign: "center", zIndex: 5, lineHeight: "1.6", fontWeight: "500" };
 const overlayStyle = { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(17, 24, 39, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999, backdropFilter: "blur(4px)" };
-const modalStyle = { background: "white", padding: "32px", borderRadius: "20px", display: "flex", flexDirection: "column", gap: "16px", width: "100%", maxWidth: "550px", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)" };
 const toolbarStyle = { display: "flex", gap: "8px", background: "#f3f4f6", padding: "6px", borderRadius: "8px", alignItems: "center" };
 const toolBtn = { width: "32px", height: "32px", border: "none", borderRadius: "4px", cursor: "pointer", fontSize: "14px" };
 const selectTool = { padding: "4px 8px", border: "1px solid #e5e7eb", borderRadius: "4px", background: "white", fontSize: "13px" };
-const inputStyle = { width: "100%", padding: "12px 16px", borderRadius: "10px", border: "1px solid #d1d5db", boxSizing: "border-box", fontSize: "15px", outline: "none" };
-const textareaStyle = { width: "100%", minHeight: "160px", padding: "16px", borderRadius: "10px", border: "1px solid #d1d5db", boxSizing: "border-box", fontSize: "15px", outline: "none", resize: "vertical", lineHeight: "1.5" };
-const actionBtn = { padding: "12px 24px", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "600", fontSize: "14px" };
-const fullscreenOverlay = { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "#ffffff", zIndex: 1000, display: "flex", justifyContent: "center", overflowY: "auto" };
-const fullscreenContentCard = { width: "100%", maxWidth: "800px", padding: "60px 24px", display: "flex", flexDirection: "column" };
-const previewHeader = { display: "flex", justifyContent: "space-between", alignItems: "center", background: "#f9fafb", padding: "16px 24px", borderRadius: "14px", border: "1px solid #e5e7eb" };
+const inputStyle = { width: "100%", padding: "12px 16px", borderRadius: "10px", border: "1px solid #d1d5db", boxSizing: "border-box", fontSize: "14px", outline: "none", background: "#ffffff", color: "#111827", fontWeight: "600" };
+const actionBtn = { padding: "10px 20px", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "600", fontSize: "13px", transition: "all 0.15s ease" };
+const previewHeader = { display: "flex", justifyContent: "space-between", alignItems: "center", background: "#f9fafb", padding: "12px 20px", borderRadius: "14px", border: "1px solid #e5e7eb" };
+
+// 🌟 BRAND NEW UNIFIED INTERFACE STYLE VARIABLE COMPENDIUM
+const unifiedModalCard = { background: "#ffffff", padding: "28px", borderRadius: "24px", display: "flex", flexDirection: "column", gap: "16px", width: "100%", maxWidth: "700px", maxHeight: "90vh", overflowY: "auto", boxShadow: "0 25px 50px -12px rgba(15, 23, 42, 0.15)", border: "1px solid #e2e8f0" };
+const modalInputLabel = { fontSize: "10px", fontWeight: "800", color: "#94a3b8", letterSpacing: "0.06em" };
+const colorPickerTool = { width: "32px", height: "32px", border: "none", cursor: "pointer", padding: 0, background: "none" };
+const framedContentTextareaContainer = { display: "flex", flexDirection: "column", border: "1px solid #cbd5e1", borderRadius: "12px", overflow: "hidden" };
+const textareaHeaderLabel = { background: "#f8fafc", borderBottom: "1px solid #cbd5e1", padding: "8px 14px", fontSize: "10px", fontWeight: "800", color: "#64748b", letterSpacing: "0.04em" };
+const editorModalTextarea = { width: "100%", minHeight: "220px", padding: "16px", border: "none", boxSizing: "border-box", fontSize: "14px", outline: "none", resize: "vertical", lineHeight: "1.6", color: "#334155", background: "#ffffff" };
+const metaSettingsRow = { display: "flex", gap: "20px", alignItems: "flex-end", background: "#f8fafc", padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0" };
+const checkboxSettingWrapper = { display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", flex: 1, userSelect: "none" };
+const formActionFooter = { display: "flex", gap: "12px", justifyContent: "flex-end", marginTop: "10px", borderTop: "1px solid #e2e8f0", paddingTop: "16px" };

@@ -18,47 +18,29 @@ export default function AdvancedCalendarTile({
     <div style={tileWrapper} data-date={dateStr}>
       <div style={tileNotesScrollArea}>
         {dayEvents.map((event) => (
-          <div key={event.id} style={{ display: "flex", flexDirection: "column", width: "100%" }}>
-            {/* Primary Document Header Card */}
-            <div
-              draggable
-              onDragStart={(e) => handleDragStart(e, event.id)}
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedEvent(event);
-                setIsPreviewOpen(true);
-              }}
-              style={{
-                ...modernInlineBadge,
-                background: `${event.color}14`,
-                borderLeft: `3px solid ${event.color}`,
-              }}
-              title="Drag node to reschedule"
-            >
-              <span style={{ ...badgeTime, pointerEvents: "none" }}>{event.time}</span>
-              <span style={{ ...badgeText, pointerEvents: "none" }}>{event.title}</span>
-            </div>
-
-            {/* Shared Tasks List rendering inside the calendar card */}
-            {event.tasks && event.tasks.length > 0 && (
-              <div style={tileInlineTaskList}>
-                {event.tasks.map((task) => (
-                  <div key={task.id} style={tileInlineTaskRow}>
-                    <span style={{ 
-                      ...miniTaskDot, 
-                      background: task.completed ? "#9ca3af" : event.color 
-                    }} />
-                    <span style={{ 
-                      ...tileTaskText,
-                      textDecoration: task.completed ? "line-through" : "none",
-                      opacity: task.completed ? 0.5 : 1
-                    }}>
-                      {task.text}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+          <div
+            key={event.id}
+            draggable
+            onDragStart={(e) => handleDragStart(e, event.id)}
+            onClick={(e) => {
+              e.stopPropagation(); // Opens your single unified component modal window securely
+              setSelectedEvent(event);
+              setIsPreviewOpen(true);
+            }}
+            style={{
+              ...premiumLegacyBadge,
+              borderLeft: `5px solid ${event.color}`, // Matches the high-density color accent bar exactly
+            }}
+            title="Drag note to reschedule"
+          >
+            <span style={{ 
+              ...badgeText, 
+              fontFamily: event.fontStyle || "sans-serif",
+              fontWeight: event.isBold ? "700" : "600", // Dynamically supports bold weight state tags
+              fontStyle: event.isItalic ? "italic" : "normal"
+            }}>
+              {event.title}
+            </span>
           </div>
         ))}
       </div>
@@ -66,12 +48,36 @@ export default function AdvancedCalendarTile({
   );
 }
 
+// ==========================================
+// 🎨 ORIGINAL CORE PREMIUM DESIGN STYLES
+// ==========================================
 const tileWrapper = { display: "flex", flexDirection: "column", height: "100%", width: "100%", justifyContent: "flex-start", minHeight: "85px", padding: "4px", boxSizing: "border-box", position: "relative" };
-const tileNotesScrollArea = { display: "flex", flexDirection: "column", gap: "6px", overflowY: "auto", maxHeight: "75px", width: "100%" };
-const modernInlineBadge = { fontSize: "10px", borderRadius: "4px", padding: "2px 4px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "2px", cursor: "grab", zIndex: 10 };
-const badgeTime = { fontWeight: "700", opacity: 0.8, fontSize: "9px", whiteSpace: "nowrap" };
-const badgeText = { flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "left", marginLeft: "2px", fontWeight: "600" };
-const tileInlineTaskList = { display: "flex", flexDirection: "column", gap: "2px", marginTop: "4px", paddingLeft: "6px" };
-const tileInlineTaskRow = { display: "flex", alignItems: "center", gap: "4px", width: "100%" };
-const miniTaskDot = { width: "4px", height: "4px", borderRadius: "50%", flexShrink: 0 };
-const tileTaskText = { fontSize: "9px", color: "#4b5563", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "left" };
+const tileNotesScrollArea = { display: "flex", flexDirection: "column", gap: "5px", overflowY: "auto", maxHeight: "90px", width: "100%" };
+
+// Rebuilt exactly from the original "Diploma Project Defense Planning" token metrics
+const premiumLegacyBadge = {
+  fontSize: "10px",
+  borderRadius: "6px",
+  padding: "2px 3px",
+  display: "flex",
+  alignItems: "center",
+  background: "#ffffff", // Pure white card texture canvas background
+  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02)", // Premium soft spatial card shadows
+  cursor: "grab",
+  zIndex: 10,
+  border: "1px solid #e5e7eb", // Framed card grid borders boundary
+  transition: "all 0.15s ease",
+  marginBottom: "2px",
+  width: "100%",
+  boxSizing: "border-box"
+};
+
+const badgeText = { 
+  flex: 1, 
+  overflow: "hidden", 
+  textOverflow: "ellipsis", 
+  whiteSpace: "nowrap", 
+  textAlign: "left", 
+  color: "#111827", // Distinct deep text coloring profile
+  pointerEvents: "none" 
+};
