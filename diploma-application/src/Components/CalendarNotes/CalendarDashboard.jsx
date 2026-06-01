@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 import CalendarFilters from "./CalendarFilters";
 import AdvancedCalendarTile from "./AdvancedCalendarTile";
 import { Calendar as ClockIcon } from "lucide-react";
@@ -62,7 +63,7 @@ export default function CalendarDashboard({
         events={allEvents}
       />
 
-      <div style={gridContainer}>
+      <div className="dash-grid" style={gridContainer}>
         <div 
           style={calendarCardExtended} 
           className="premium-calendar-wrapper"
