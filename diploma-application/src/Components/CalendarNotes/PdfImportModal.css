@@ -1,0 +1,34 @@
+.pdf-import-backdrop { position: fixed; inset: 0; z-index: 1200; background: rgba(15,23,42,0.45); display: flex; align-items: center; justify-content: center; padding: 24px; }
+.pdf-import-modal { width: min(560px,100%); max-height: min(90vh,780px); background: #fff; border-radius: 16px; box-shadow: 0 24px 64px rgba(0,0,0,0.18); display: flex; flex-direction: column; overflow: hidden; }
+.pdf-import-header { display: flex; justify-content: space-between; gap: 16px; padding: 20px 24px; border-bottom: 1px solid #f1f5f9; }
+.pdf-import-header__title { display: flex; gap: 12px; color: #4f46e5; }
+.pdf-import-header__title h2 { margin: 0; font-size: 17px; color: #111827; }
+.pdf-import-header__title p { margin: 2px 0 0; font-size: 13px; color: #6b7280; }
+.pdf-import-close { border: none; background: #f3f4f6; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; }
+.pdf-import-dropzone { margin: 24px; padding: 48px 24px; border: 2px dashed #d1d5db; border-radius: 14px; text-align: center; cursor: pointer; }
+.pdf-import-dropzone__title { margin: 12px 0 0; font-weight: 600; color: #374151; }
+.pdf-import-processing { padding: 48px 24px; text-align: center; color: #4f46e5; }
+.pdf-import-spin { animation: pdfSpin 0.8s linear infinite; }
+@keyframes pdfSpin { to { transform: rotate(360deg); } }
+.pdf-import-review { padding: 0 24px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+.pdf-import-suggestion { display: flex; gap: 10px; padding: 12px 14px; background: #eef2ff; border-radius: 10px; font-size: 13px; color: #3730a3; }
+.pdf-import-field { display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; }
+.pdf-import-field input, .pdf-import-section select, .pdf-import-section input { padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 14px; text-transform: none; }
+.pdf-import-preview { max-height: 140px; overflow-y: auto; padding: 12px; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 14px; background: #fafafa; }
+.pdf-import-section h3 { display: flex; align-items: center; gap: 6px; margin: 0 0 10px; font-size: 13px; }
+.pdf-import-segment { display: flex; gap: 4px; padding: 3px; background: #f3f4f6; border-radius: 10px; margin-bottom: 10px; }
+.pdf-import-segment button { flex: 1; border: none; background: transparent; padding: 7px 10px; border-radius: 8px; font-size: 12px; cursor: pointer; }
+.pdf-import-segment button.is-active { background: #fff; color: #4f46e5; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+.pdf-import-attachment { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 13px; }
+.pdf-import-attachment__tag { margin-left: auto; font-size: 11px; color: #059669; background: #ecfdf5; padding: 3px 8px; border-radius: 6px; }
+.pdf-import-error { margin: 0 24px; padding: 10px 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; color: #b91c1c; font-size: 13px; }
+.pdf-import-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 24px; border-top: 1px solid #f1f5f9; }
+.pdf-import-btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
+.pdf-import-btn--ghost { background: #f3f4f6; color: #374151; }
+.pdf-import-btn--primary { background: #4f46e5; color: #fff; }
+.pdf-import-sidebar-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; padding: 12px; border: 1px dashed #4b5563; border-radius: 12px; background: transparent; color: #d1d5db; font-size: 14px; cursor: pointer; }
+.pdf-import-sidebar-btn:hover { border-color: #818cf8; color: #fff; background: rgba(79,70,229,0.15); }
+.note-attachments { padding-top: 12px; border-top: 1px solid #e2e8f0; margin-top: 12px; }
+.note-attachments__title { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 8px; }
+.note-attachment-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #f8fafc; border-radius: 8px; font-size: 13px; }
+.note-attachment-item a { margin-left: auto; color: #4f46e5; text-decoration: none; font-size: 12px; }
