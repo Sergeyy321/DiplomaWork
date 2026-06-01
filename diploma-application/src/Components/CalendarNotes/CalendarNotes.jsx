@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import AiAnalyzerSuite from "./AiAnalyzerSuite";
 import CalendarDashboard from "./CalendarDashboard";
 import TopicNotesView from "./TopicNotesView";
-import NoteAnalysisView from "./NoteAnalysisView";
+import NoteEditorPanel from "./NoteEditorPanel";
 import PdfImportModal from "./PdfImportModal";
 import { addSubcategory } from "../../utils/topicStorage";
 import "./PdfImportModal.css";
@@ -28,6 +28,19 @@ import {
   Upload,
   Layers,
 } from "lucide-react";
+
+const EMPTY_FORM = {
+  title: "",
+  content: "",
+  time: "12:00",
+  color: "#4f46e5",
+  fontStyle: "sans-serif",
+  fontSize: 16,
+  isBold: false,
+  isItalic: false,
+  align: "left",
+  reminder: false,
+};
 
 export default function CalendarNote() {
   const [date, setDate] = useState(new Date());
@@ -64,20 +77,16 @@ export default function CalendarNote() {
     }
   ]);
 
-  // 🌟 CONSOLIDATED STATE ARTIFACTS
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNotePanelOpen, setIsNotePanelOpen] = useState(false);
+  const [notePanelMode, setNotePanelMode] = useState("create");
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const [editingId, setEditingId] = useState(null);
-  const [activeTab, setActiveTab] = useState("calendar"); 
+  const [activeTab, setActiveTab] = useState("calendar");
   const [aiTargetNote, setAiTargetNote] = useState(null);
   const [isPdfImportOpen, setIsPdfImportOpen] = useState(false);
-  const [modalView, setModalView] = useState("note");
   const [pendingSubcategoryId, setPendingSubcategoryId] = useState(null);
-
-  const [form, setForm] = useState({
-    title: "", content: "", time: "12:00", color: "#4f46e5",
-    fontStyle: "sans-serif", isBold: false, isItalic: false, align: "left", reminder: false,
-  });
+  const [form, setForm] = useState(EMPTY_FORM);
 
   const dragNodeId = useRef(null);
   const dragStartPos = useRef({ x: 0, y: 0 });
@@ -183,76 +192,75 @@ export default function CalendarNote() {
     setFolders(folders.filter((f) => f.id !== id));
   };
   
-  // 🌟 TRIGGER MODAL FRAMEWORK FOR CREATION PASSES
-  const handleDateClick = (date) => {
-    setSelectedDate(date);
+  const closeNotePanel = () => {
+    setIsNotePanelOpen(false);
     setEditingId(null);
-    setModalView("note");
-    setForm({ title: "", content: "", time: "12:00", color: "#4f46e5", fontStyle: "sans-serif", isBold: false, isItalic: false, align: "left", reminder: false });
-    setIsModalOpen(true);
+    setPendingSubcategoryId(null);
+    setSelectedEvent(null);
   };
 
-  // 🌟 TRIGGER MODAL FRAMEWORK FOR MODIFICATION PASSES
-  const handleSelectExistingNote = (event) => {
+  const openCreateNotePanel = (targetDate = date) => {
+    setSelectedDate(targetDate);
+    setSelectedEvent(null);
+    setEditingId(null);
+    setForm({ ...EMPTY_FORM });
+    setNotePanelMode("create");
+    setIsNotePanelOpen(true);
+  };
+
+  const openNoteEditor = (event) => {
+    setSelectedEvent(event);
     setSelectedDate(new Date(event.date));
     setEditingId(event.id);
-    setModalView("note");
-    setForm({ 
-      title: event.title, 
-      content: event.content || "", 
-      time: event.time, 
-      color: event.color, 
-      fontStyle: event.fontStyle || "sans-serif", 
-      isBold: event.isBold || false, 
-      isItalic: event.isItalic || false, 
-      align: event.align || "left", 
-      reminder: event.reminder || false 
+    setForm({
+      title: event.title,
+      content: event.content || "",
+      time: event.time,
+      color: event.color,
+      fontStyle: event.fontStyle || "sans-serif",
+      fontSize: event.fontSize || 16,
+      isBold: event.isBold || false,
+      isItalic: event.isItalic || false,
+      align: event.align || "left",
+      reminder: event.reminder || false,
     });
-    setIsModalOpen(true);
+    setNotePanelMode("edit");
+    setIsNotePanelOpen(true);
   };
 
-const handleSubmit = () => {
-  // Defensive validation: ensure we fall back to a guaranteed valid date object
-  let targetDate = selectedDate;
-  
-  if (!targetDate || isNaN(new Date(targetDate).getTime())) {
-    targetDate = date || new Date();
-  }
+  const handleSaveNote = (savedForm = form) => {
+    const targetDate = selectedDate || date;
+    const dateString = new Date(targetDate).toISOString().split("T")[0];
+    const payload = { ...savedForm, isBold: false, isItalic: false };
 
-  // Ensure it's treated as a clean JavaScript Date object
-  const validDateObject = new Date(targetDate);
-  const dateString = validDateObject.toISOString().split("T")[0];
-
-  if (editingId) {
-    setEvents(events.map(e => e.id === editingId ? { ...e, ...form, date: dateString } : e));
-  } else {
-    const angle = Math.random() * Math.PI * 2;
-    const radius = 130 + Math.random() * 40;
-    setEvents([
-      ...events,
-      {
-        id: Date.now(),
-        folderId: activeFolder,
-        date: dateString,
-        fullDate: validDateObject,
-        x: Math.cos(angle) * radius,
-        y: Math.sin(angle) * radius,
-        subcategoryId: pendingSubcategoryId,
-        attachments: [],
-        ...form,
-      },
-    ]);
-  }
-  
-  setIsModalOpen(false);
-  setEditingId(null);
-  setSelectedDate(null);
-  setPendingSubcategoryId(null);
-};
+    if (editingId) {
+      setEvents((prev) =>
+        prev.map((event) => (event.id === editingId ? { ...event, ...payload, date: dateString } : event))
+      );
+    } else {
+      const angle = Math.random() * Math.PI * 2;
+      const radius = 130 + Math.random() * 40;
+      setEvents((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          folderId: activeFolder,
+          subcategoryId: pendingSubcategoryId || null,
+          date: dateString,
+          fullDate: new Date(targetDate),
+          x: Math.cos(angle) * radius,
+          y: Math.sin(angle) * radius,
+          attachments: [],
+          ...payload,
+        },
+      ]);
+    }
+    closeNotePanel();
+  };
 
   const deleteNotification = (id) => {
-    setEvents(events.filter((e) => e.id !== id));
-    setIsModalOpen(false);
+    setEvents((prev) => prev.filter((event) => event.id !== id));
+    if (selectedEvent?.id === id) closeNotePanel();
     if (aiTargetNote?.id === id) setAiTargetNote(null);
   };
 
@@ -282,26 +290,10 @@ const handleSubmit = () => {
     );
   };
 
-  const triggerAiRouting = () => {
-    const temporaryNotePayload = {
-      id: editingId || Date.now(),
-      folderId: activeFolder,
-      title: form.title,
-      content: form.content,
-      time: form.time,
-      color: form.color,
-      date: (selectedDate || date).toISOString().split("T")[0],
-      aiAnalysis: editingId ? events.find((e) => e.id === editingId)?.aiAnalysis : null,
-    };
-    setAiTargetNote(temporaryNotePayload);
-    setIsModalOpen(false);
-    setActiveTab("ai-analyzer");
-  };
-
   const handleTopicCreateNote = (folderId, subcategoryId) => {
     setActiveFolder(folderId);
     setPendingSubcategoryId(subcategoryId || null);
-    handleDateClick(date);
+    openCreateNotePanel(new Date());
   };
 
   const handleUnassignSubcategoryNotes = (subId) => {
@@ -339,6 +331,7 @@ const handleSubmit = () => {
       time: "12:00",
       color: "#4f46e5",
       fontStyle: "sans-serif",
+      fontSize: 16,
       isBold: false,
       isItalic: false,
       align: "left",
@@ -358,22 +351,14 @@ const handleSubmit = () => {
     setActiveTab("topics");
   };
 
-  const editingNote = editingId ? events.find((e) => e.id === editingId) : null;
-  const modalAnalysisNote = editingNote || (form.title || form.content ? {
-    id: editingId || "draft",
-    title: form.title,
-    content: form.content,
-    aiAnalysis: editingNote?.aiAnalysis,
-  } : null);
-
   const filteredEvents = events.filter((e) => e.folderId === activeFolder);
   const selectedDateStr = date.toISOString().split("T")[0];
   const dayEventsForMindMap = filteredEvents.filter((e) => e.date === selectedDateStr);
 
   return (
-    <div style={workspaceContainer}>
+    <div className="ws-shell" style={workspaceContainer}>
       {/* SIDEBAR */}
-      <div style={sidebarStyle}>
+      <div className="ws-sidebar" style={sidebarStyle}>
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
             <h4 style={{ ...sidebarTitle, display: "flex", alignItems: "center", gap: "8px" }}>
@@ -414,7 +399,7 @@ const handleSubmit = () => {
           </div>
         </div>
 
-        <button onClick={() => handleDateClick(date)} style={quickNoteButton}>
+        <button onClick={() => openCreateNotePanel(date)} style={quickNoteButton}>
           <FileEdit size={16} /> Compose Note
         </button>
 
@@ -424,9 +409,9 @@ const handleSubmit = () => {
       </div>
 
       {/* MAIN CONTENT */}
-      <div style={mainContentStyle}>
-        <div style={tabHeaderStyle}>
-          <div style={{ display: "flex", gap: "10px" }}>
+      <div className="ws-main" style={mainContentStyle}>
+        <div className="ws-tabs" style={tabHeaderStyle}>
+          <div className="ws-tabs__buttons" style={{ display: "flex", gap: "10px" }}>
             <button onClick={() => setActiveTab("calendar")} style={{ ...tabButton, display: "flex", alignItems: "center", gap: "8px", background: activeTab === "calendar" ? "#4f46e5" : "#e5e7eb", color: activeTab === "calendar" ? "white" : "#374151" }}>
               <CalendarIcon size={15} /> Calendar Dashboard
             </button>
@@ -451,9 +436,9 @@ const handleSubmit = () => {
             setDate={setDate}
             allEvents={events}
             setEvents={setEvents}
-            handleDateClick={handleSelectExistingNote} // 🌟 Launches uniform modal with pre-filled content
-            setSelectedEvent={handleSelectExistingNote} // 🌟 Direct map to unified workflow interface
-            setIsPreviewOpen={setIsModalOpen}
+            handleDateClick={openCreateNotePanel}
+            setSelectedEvent={openNoteEditor}
+            setIsPreviewOpen={() => setIsNotePanelOpen(true)}
           />
         )}
 
@@ -475,7 +460,7 @@ const handleSubmit = () => {
                   <div 
                     onMouseDown={(e) => onNodeMouseDown(e, event.id, event.x, event.y)} 
                     onClick={(e) => e.stopPropagation()}
-                    onDoubleClick={() => handleSelectExistingNote(event)}
+                    onDoubleClick={() => openNoteEditor(event)}
                     style={{ ...mindMapNode, transform: `translate(calc(-50% + ${event.x}px), calc(-50% + ${event.y}px))`, borderLeft: `5px solid ${event.color}`, cursor: dragNodeId.current === event.id ? "grabbing" : "grab" }}
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", gap: "10px" }}>
@@ -515,146 +500,28 @@ const handleSubmit = () => {
             folders={folders.map((f) => ({ id: f.id, title: f.title }))}
             events={events}
             onCreateNote={handleTopicCreateNote}
-            onOpenNote={handleSelectExistingNote}
+            onOpenNote={openNoteEditor}
             onDeleteNote={deleteNotification}
+            onUpdateNotePosition={(id, x, y) =>
+              setEvents((prev) => prev.map((e) => (e.id === id ? { ...e, x, y } : e)))
+            }
             onUnassignSubcategoryNotes={handleUnassignSubcategoryNotes}
           />
         )}
       </div>
 
-      {/* =========================================================
-          🌟 UNIFIED MODAL COMPONENT (CREATE, READ & EDIT IN ONE)
-          ========================================================= */}
-      {isModalOpen && (
-        <div style={overlayStyle}>
-          <div style={unifiedModalCard}>
-            
-            {/* Header Control panel */}
-            <div style={previewHeader}>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <div style={{ width: "14px", height: "14px", borderRadius: "50%", background: form.color, border: "1px solid #cbd5e1" }} />
-                <span style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#4b5563", fontWeight: "700" }}>
-                  <Bell size={14} /> Scheduled: {form.time}
-                </span>
-              </div>
-              
-              <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                {editingId && (
-                  <div style={modalViewToggle}>
-                    <button type="button" style={{ ...modalViewBtn, ...(modalView === "note" ? modalViewBtnActive : {}) }} onClick={() => setModalView("note")}>Note</button>
-                    <button type="button" style={{ ...modalViewBtn, ...(modalView === "analysis" ? modalViewBtnActive : {}) }} onClick={() => setModalView("analysis")}>Analysis</button>
-                  </div>
-                )}
-                <button onClick={triggerAiRouting} style={{ ...actionBtn, display: "flex", alignItems: "center", gap: "6px", background: "#d1fae5", color: "#065f46", border: "1px solid #10b981" }}>
-                  <Cpu size={14} /> Analyze with AI
-                </button>
-                {editingId && (
-                  <button onClick={() => deleteNotification(editingId)} style={{ ...actionBtn, display: "flex", alignItems: "center", gap: "6px", background: "#fee2e2", color: "#dc2626" }}>
-                    <Trash2 size={14} /> Purge
-                  </button>
-                )}
-                <button onClick={() => setIsModalOpen(false)} style={{ ...actionBtn, display: "flex", alignItems: "center", gap: "6px", background: "#1f2937", color: "white" }}>
-                  <X size={14} /> Exit Screen
-                </button>
-              </div>
-            </div>
-
-            {modalView === "analysis" && editingId ? (
-              <div style={{ minHeight: "360px" }}>
-                <NoteAnalysisView
-                  note={modalAnalysisNote}
-                  compact
-                  onSaveAnalysis={saveNoteAnalysis}
-                />
-              </div>
-            ) : (
-              <>
-            {/* Document Title Input Field Layer */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label style={modalInputLabel}>DOCUMENT TITLE</label>
-              <input 
-                placeholder="Enter workspace document title..." 
-                value={form.title} 
-                style={inputStyle} 
-                onChange={(e) => setForm({ ...form, title: e.target.value })} 
-              />
-            </div>
-
-            {/* Custom Parameter Text Toolbar */}
-            <div style={toolbarStyle}>
-              <button type="button" style={{ ...toolBtn, background: form.isBold ? "#d1d5db" : "#f3f4f6", fontWeight: "bold" }} onClick={() => setForm({ ...form, isBold: !form.isBold })} >B</button>
-              <button type="button" style={{ ...toolBtn, background: form.isItalic ? "#d1d5db" : "#f3f4f6", fontStyle: "italic" }} onClick={() => setForm({ ...form, isItalic: !form.isItalic })} >I</button>
-              
-              <select value={form.fontStyle} style={selectTool} onChange={(e) => setForm({ ...form, fontStyle: e.target.value })} >
-                <option value="sans-serif">System Sans</option>
-                <option value="serif">Classic Serif</option>
-                <option value="monospace">Developer Code</option>
-              </select>
-              
-              <select value={form.align} style={selectTool} onChange={(e) => setForm({ ...form, align: e.target.value })} >
-                <option value="left">Align Left</option>
-                <option value="center">Align Center</option>
-                <option value="right">Align Right</option>
-              </select>
-              
-              <input type="color" value={form.color} style={colorPickerTool} onChange={(e) => setForm({ ...form, color: e.target.value })} />
-            </div>
-
-            {/* Framed Content Editor Panel Canvas */}
-            <div style={framedContentTextareaContainer}>
-              <div style={textareaHeaderLabel}>DOCUMENT REPOSITORY SPACE</div>
-              <textarea 
-                placeholder="Write down details, timeline logs, or custom notes here..." 
-                value={form.content} 
-                style={{ 
-                  ...editorModalTextarea, 
-                  fontFamily: form.fontStyle, 
-                  fontWeight: form.isBold ? "bold" : "normal", 
-                  fontStyle: form.isItalic ? "italic" : "normal", 
-                  textAlign: form.align,
-                  borderTop: `4px solid ${form.color}` 
-                }} 
-                onChange={(e) => setForm({ ...form, content: e.target.value })} 
-              />
-            </div>
-
-            {/* System Metadata Configuration Layer */}
-            <div style={metaSettingsRow}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px", flex: 1 }}>
-                <label style={modalInputLabel}>EXECUTION TIME</label>
-                <input type="time" value={form.time} style={inputStyle} onChange={(e) => setForm({ ...form, time: e.target.value })} />
-              </div>
-              
-              <label style={checkboxSettingWrapper}>
-                <input type="checkbox" checked={form.reminder} onChange={(e) => setForm({ ...form, reminder: e.target.checked })} style={{ width: "16px", height: "16px" }} /> 
-                <div>
-                  <div style={{ fontWeight: "700", fontSize: "13px", color: "#111827" }}>Push Notification Trigger</div>
-                  <div style={{ fontSize: "11px", color: "#6b7280" }}>Enable real-time tab sound cues</div>
-                </div>
-              </label>
-            </div>
-
-            {editingNote?.attachments?.length > 0 && (
-              <div style={attachmentsRow}>
-                {editingNote.attachments.map((att) => (
-                  <a key={att.id} href={att.dataUrl} download={att.name} style={attachmentChip}>
-                    {att.name}
-                  </a>
-                ))}
-              </div>
-            )}
-
-            {/* Direct Save Action Submission */}
-            <div style={formActionFooter}>
-              <button onClick={() => setIsModalOpen(false)} style={{ ...actionBtn, background: "#e5e7eb", color: "#374151" }}>Discard</button>
-              <button onClick={handleSubmit} style={{ ...actionBtn, background: "#4f46e5", color: "white", padding: "12px 32px" }}>Commit Changes</button>
-            </div>
-              </>
-            )}
-
-          </div>
-        </div>
-      )}
+      <NoteEditorPanel
+        isOpen={isNotePanelOpen}
+        mode={notePanelMode}
+        editorKey={editingId ?? "new"}
+        form={form}
+        setForm={setForm}
+        onSave={handleSaveNote}
+        onClose={closeNotePanel}
+        onDelete={notePanelMode === "edit" && selectedEvent ? () => deleteNotification(selectedEvent.id) : undefined}
+        noteRecord={selectedEvent}
+        onSaveAnalysis={saveNoteAnalysis}
+      />
 
       <PdfImportModal
         isOpen={isPdfImportOpen}
@@ -669,8 +536,8 @@ const handleSubmit = () => {
 // ==========================================
 // 🎨 UPDATED DESIGN STYLE VALUES
 // ==========================================
-const workspaceContainer = { display: "flex", height: "calc(100vh - 60px)", fontFamily: "'Inter', sans-serif", background: "#f9fafb" };
-const sidebarStyle = { width: "280px", background: "#111827", color: "#f9fafb", padding: "24px 20px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderRight: "1px solid #1f2937" };
+const workspaceContainer = { display: "flex", height: "100%", width: "100%", fontFamily: "'Inter', sans-serif", background: "#f9fafb" };
+const sidebarStyle = { width: "280px", flexShrink: 0, background: "#111827", color: "#f9fafb", padding: "24px 20px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderRight: "1px solid #1f2937", overflowY: "auto" };
 const sidebarTitle = { margin: 0, fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.06em", color: "#9ca3af", fontWeight: "700" };
 const addFolderToggleBtn = { background: "none", border: "none", color: "#9ca3af", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" };
 const folderFormStyle = { background: "#1f2937", padding: "12px", borderRadius: "10px", marginBottom: "12px", display: "flex", flexDirection: "column", gap: "8px", border: "1px solid #374151" };
@@ -682,7 +549,7 @@ const folderActionBtnDelete = { position: "absolute", right: "10px", background:
 const folderActionBtnCancel = { background: "#4b5563", color: "#e5e7eb", border: "none", borderRadius: "6px", padding: "6px 10px" };
 const folderItem = { display: "flex", alignItems: "center", gap: "12px", padding: "12px 14px", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: "500", transition: "all 0.15s ease" };
 const quickNoteButton = { background: "#4f46e5", color: "white", border: "none", borderRadius: "12px", padding: "16px", fontSize: "15px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 4px 14px rgba(79, 70, 229, 0.35)" };
-const mainContentStyle = { flex: 1, padding: "32px", display: "flex", flexDirection: "column", gap: "24px", overflowY: "auto" };
+const mainContentStyle = { flex: 1, minWidth: 0, padding: "32px", display: "flex", flexDirection: "column", gap: "24px", overflowY: "auto" };
 const tabHeaderStyle = { display: "flex", justifyContent: "space-between", alignItems: "center" };
 const tabButton = { border: "none", padding: "12px 20px", borderRadius: "10px", fontWeight: "600", fontSize: "14px", cursor: "pointer", transition: "all 0.2s ease" };
 const statusBadge = { background: "#ffffff", padding: "8px 16px", borderRadius: "30px", fontSize: "13px", fontWeight: "600", color: "#4b5563", border: "1px solid #e5e7eb" };

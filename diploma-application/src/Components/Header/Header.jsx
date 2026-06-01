@@ -2,17 +2,7 @@
 
 
 function Header() {
-  const counter = 5;
-
-    return (
-        <div className="App">
-            {counter}
-            
-      {/* <p>Welcome to the Diploma Application </p> */}
-  
-        </div>
-   
-    );
+  return null;
 }
 
 export default Header;

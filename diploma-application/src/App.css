@@ -1,3 +1,95 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ===========================================================
+   Full-screen responsive application shell
+   =========================================================== */
+.app-shell {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #f3f4f6;
+}
+
+.app-body {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+}
+
+/* The CalendarNotes workspace fills the body */
+.ws-shell {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Tab buttons wrap instead of overflowing horizontally */
+.ws-tabs__buttons {
+  flex-wrap: wrap;
+}
+
+/* Tablet / small laptops */
+@media (max-width: 1024px) {
+  .ws-main {
+    padding: 20px !important;
+  }
+  .dash-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Mobile: stack the layout and let the page scroll naturally */
+@media (max-width: 820px) {
+  .app-shell {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+  .app-body {
+    display: block;
+  }
+  .ws-shell {
+    flex-direction: column !important;
+    height: auto !important;
+  }
+  .ws-sidebar {
+    width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid #1f2937;
+  }
+  .ws-main {
+    padding: 16px !important;
+    overflow: visible !important;
+  }
+  .ws-tabs {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px;
+  }
+  .ws-tabs__buttons {
+    flex-wrap: wrap !important;
+  }
+  .ws-tabs__buttons button {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .ws-main {
+    padding: 12px !important;
+  }
+  .react-calendar__tile {
+    min-height: 64px !important;
+    padding: 6px 4px !important;
+  }
+}
+
 .App {
   text-align: center;
 }

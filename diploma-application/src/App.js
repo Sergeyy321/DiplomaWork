@@ -5,14 +5,11 @@ import Header from './Components/Header/Header';
 
 const App = () => {
   return (
-    <div style={{ minHeight: "100vh", background: "#f3f4f6", display: "flex", flexDirection: "column" }}>
-
+    <div className="app-shell">
       <Header />
-      
-
-      <div style={{ flex: 1 }}>
+      <main className="app-body">
         <CalendarNote />
-      </div>
+      </main>
     </div>
   );
 };
