@@ -556,7 +556,6 @@ export default function TopicNotesView({
               <span className="topic-spatial-node-type">Subcategory</span>
               <span className="topic-spatial-node-title">{subcategory.title}</span>
               <span className="topic-spatial-node-meta">{notesCount} notes</span>
-              <span className="topic-spatial-node-hint">Open</span>
               <button
                 type="button"
                 className="topic-spatial-sub-delete"

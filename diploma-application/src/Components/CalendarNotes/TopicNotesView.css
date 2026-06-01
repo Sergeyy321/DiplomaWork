@@ -23,7 +23,6 @@
   position: absolute;
   inset: 0;
   transform-origin: 0 0;
-  will-change: transform;
 }
 
 .topic-spatial-line {
@@ -86,6 +85,7 @@
   word-break: break-word;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -187,6 +187,7 @@
   max-width: 120px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -213,14 +214,23 @@
 
 .topic-spatial-note-top {
   display: flex;
+  flex-wrap: nowrap;
   justify-content: space-between;
   align-items: center;
   gap: 8px;
 }
 
+.topic-spatial-note-top .topic-spatial-node-type {
+  flex-shrink: 0;
+}
+
 .topic-spatial-drag-label {
   font-size: 10px;
   color: #9ca3af;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .topic-spatial-note-actions {
