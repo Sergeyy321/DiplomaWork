@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
 import AiAnalyzerSuite from "./AiAnalyzerSuite";
 import CalendarDashboard from "./CalendarDashboard";
-import AdvancedCalendarTile from "./AdvancedCalendarTile";
-import CalendarFilters from "./CalendarFilters";
+import TopicNotesView from "./TopicNotesView";
+import NoteAnalysisView from "./NoteAnalysisView";
+import PdfImportModal from "./PdfImportModal";
+import { addSubcategory } from "../../utils/topicStorage";
+import "./PdfImportModal.css";
 
 // ==========================================
 // 🎨 PREMIUM LUCIDE REACT ICON IMPORTS
@@ -23,7 +24,9 @@ import {
   Cpu, 
   Bell, 
   Trash2, 
-  X 
+  X,
+  Upload,
+  Layers,
 } from "lucide-react";
 
 export default function CalendarNote() {
@@ -67,6 +70,9 @@ export default function CalendarNote() {
   const [editingId, setEditingId] = useState(null);
   const [activeTab, setActiveTab] = useState("calendar"); 
   const [aiTargetNote, setAiTargetNote] = useState(null);
+  const [isPdfImportOpen, setIsPdfImportOpen] = useState(false);
+  const [modalView, setModalView] = useState("note");
+  const [pendingSubcategoryId, setPendingSubcategoryId] = useState(null);
 
   const [form, setForm] = useState({
     title: "", content: "", time: "12:00", color: "#4f46e5",
@@ -181,6 +187,7 @@ export default function CalendarNote() {
   const handleDateClick = (date) => {
     setSelectedDate(date);
     setEditingId(null);
+    setModalView("note");
     setForm({ title: "", content: "", time: "12:00", color: "#4f46e5", fontStyle: "sans-serif", isBold: false, isItalic: false, align: "left", reminder: false });
     setIsModalOpen(true);
   };
@@ -189,6 +196,7 @@ export default function CalendarNote() {
   const handleSelectExistingNote = (event) => {
     setSelectedDate(new Date(event.date));
     setEditingId(event.id);
+    setModalView("note");
     setForm({ 
       title: event.title, 
       content: event.content || "", 
@@ -229,6 +237,8 @@ const handleSubmit = () => {
         fullDate: validDateObject,
         x: Math.cos(angle) * radius,
         y: Math.sin(angle) * radius,
+        subcategoryId: pendingSubcategoryId,
+        attachments: [],
         ...form,
       },
     ]);
@@ -236,7 +246,8 @@ const handleSubmit = () => {
   
   setIsModalOpen(false);
   setEditingId(null);
-  setSelectedDate(null); // Clean up state memory for the next note creation cycle
+  setSelectedDate(null);
+  setPendingSubcategoryId(null);
 };
 
   const deleteNotification = (id) => {
@@ -260,20 +271,100 @@ const handleSubmit = () => {
 
   const onCanvasMouseUp = () => { dragNodeId.current = null; };
 
+  const saveNoteAnalysis = (noteId, analysis) => {
+    setEvents((prev) =>
+      prev.map((event) =>
+        event.id === noteId ? { ...event, aiAnalysis: analysis } : event
+      )
+    );
+    setAiTargetNote((prev) =>
+      prev?.id === noteId ? { ...prev, aiAnalysis: analysis } : prev
+    );
+  };
+
   const triggerAiRouting = () => {
-    // Package current form configurations into note context format
     const temporaryNotePayload = {
       id: editingId || Date.now(),
+      folderId: activeFolder,
       title: form.title,
       content: form.content,
       time: form.time,
       color: form.color,
       date: (selectedDate || date).toISOString().split("T")[0],
+      aiAnalysis: editingId ? events.find((e) => e.id === editingId)?.aiAnalysis : null,
     };
     setAiTargetNote(temporaryNotePayload);
     setIsModalOpen(false);
     setActiveTab("ai-analyzer");
   };
+
+  const handleTopicCreateNote = (folderId, subcategoryId) => {
+    setActiveFolder(folderId);
+    setPendingSubcategoryId(subcategoryId || null);
+    handleDateClick(date);
+  };
+
+  const handleUnassignSubcategoryNotes = (subId) => {
+    setEvents((prev) =>
+      prev.map((e) => (e.subcategoryId === subId ? { ...e, subcategoryId: null } : e))
+    );
+  };
+
+  const handlePdfImportConfirm = (payload) => {
+    let targetFolderId = payload.folderId;
+
+    if (payload.folderMode === "new" && payload.newFolderTitle) {
+      targetFolderId = `folder_${Date.now()}`;
+      setFolders((prev) => [
+        ...prev,
+        { id: targetFolderId, title: payload.newFolderTitle, icon: <Folder size={16} /> },
+      ]);
+    }
+
+    let targetSubcategoryId = payload.subcategoryId;
+    if (payload.subcategoryMode === "new" && payload.newSubcategoryTitle && targetFolderId) {
+      const sub = addSubcategory(targetFolderId, payload.newSubcategoryTitle);
+      targetSubcategoryId = sub.id;
+    }
+
+    const today = new Date().toISOString().split("T")[0];
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 130 + Math.random() * 40;
+    const newNote = {
+      id: Date.now(),
+      folderId: targetFolderId,
+      title: payload.title,
+      content: payload.content,
+      date: today,
+      time: "12:00",
+      color: "#4f46e5",
+      fontStyle: "sans-serif",
+      isBold: false,
+      isItalic: false,
+      align: "left",
+      reminder: false,
+      subcategoryId: targetSubcategoryId || null,
+      attachments: payload.attachment ? [payload.attachment] : [],
+      x: Math.cos(angle) * radius,
+      y: Math.sin(angle) * radius,
+    };
+
+    if (payload.summary) {
+      newNote.aiAnalysis = { summary: payload.summary };
+    }
+
+    setEvents((prev) => [...prev, newNote]);
+    setActiveFolder(targetFolderId);
+    setActiveTab("topics");
+  };
+
+  const editingNote = editingId ? events.find((e) => e.id === editingId) : null;
+  const modalAnalysisNote = editingNote || (form.title || form.content ? {
+    id: editingId || "draft",
+    title: form.title,
+    content: form.content,
+    aiAnalysis: editingNote?.aiAnalysis,
+  } : null);
 
   const filteredEvents = events.filter((e) => e.folderId === activeFolder);
   const selectedDateStr = date.toISOString().split("T")[0];
@@ -326,6 +417,10 @@ const handleSubmit = () => {
         <button onClick={() => handleDateClick(date)} style={quickNoteButton}>
           <FileEdit size={16} /> Compose Note
         </button>
+
+        <button type="button" className="pdf-import-sidebar-btn" onClick={() => setIsPdfImportOpen(true)}>
+          <Upload size={16} /> Import PDF
+        </button>
       </div>
 
       {/* MAIN CONTENT */}
@@ -337,6 +432,9 @@ const handleSubmit = () => {
             </button>
             <button onClick={() => setActiveTab("mindmap")} style={{ ...tabButton, display: "flex", alignItems: "center", gap: "8px", background: activeTab === "mindmap" ? "#4f46e5" : "#e5e7eb", color: activeTab === "mindmap" ? "white" : "#374151" }}>
               <Network size={15} /> Spatial Coordinates Hub
+            </button>
+            <button onClick={() => setActiveTab("topics")} style={{ ...tabButton, display: "flex", alignItems: "center", gap: "8px", background: activeTab === "topics" ? "#4f46e5" : "#e5e7eb", color: activeTab === "topics" ? "white" : "#374151" }}>
+              <Layers size={15} /> Topic Spatial Hub
             </button>
             <button onClick={() => setActiveTab("ai-analyzer")} style={{ ...tabButton, display: "flex", alignItems: "center", gap: "8px", background: activeTab === "ai-analyzer" ? "#10b981" : "#e5e7eb", color: activeTab === "ai-analyzer" ? "white" : "#374151" }}>
               <Cpu size={15} /> AI Insights Suite
@@ -404,7 +502,23 @@ const handleSubmit = () => {
         )}
 
         {activeTab === "ai-analyzer" && (
-          <AiAnalyzerSuite filteredEvents={filteredEvents} aiTargetNote={aiTargetNote} setAiTargetNote={setAiTargetNote} setEvents={setEvents}/>
+          <AiAnalyzerSuite
+            filteredEvents={filteredEvents}
+            aiTargetNote={aiTargetNote}
+            setAiTargetNote={setAiTargetNote}
+            onSaveAnalysis={saveNoteAnalysis}
+          />
+        )}
+
+        {activeTab === "topics" && (
+          <TopicNotesView
+            folders={folders.map((f) => ({ id: f.id, title: f.title }))}
+            events={events}
+            onCreateNote={handleTopicCreateNote}
+            onOpenNote={handleSelectExistingNote}
+            onDeleteNote={deleteNotification}
+            onUnassignSubcategoryNotes={handleUnassignSubcategoryNotes}
+          />
         )}
       </div>
 
@@ -425,6 +539,12 @@ const handleSubmit = () => {
               </div>
               
               <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                {editingId && (
+                  <div style={modalViewToggle}>
+                    <button type="button" style={{ ...modalViewBtn, ...(modalView === "note" ? modalViewBtnActive : {}) }} onClick={() => setModalView("note")}>Note</button>
+                    <button type="button" style={{ ...modalViewBtn, ...(modalView === "analysis" ? modalViewBtnActive : {}) }} onClick={() => setModalView("analysis")}>Analysis</button>
+                  </div>
+                )}
                 <button onClick={triggerAiRouting} style={{ ...actionBtn, display: "flex", alignItems: "center", gap: "6px", background: "#d1fae5", color: "#065f46", border: "1px solid #10b981" }}>
                   <Cpu size={14} /> Analyze with AI
                 </button>
@@ -439,6 +559,16 @@ const handleSubmit = () => {
               </div>
             </div>
 
+            {modalView === "analysis" && editingId ? (
+              <div style={{ minHeight: "360px" }}>
+                <NoteAnalysisView
+                  note={modalAnalysisNote}
+                  compact
+                  onSaveAnalysis={saveNoteAnalysis}
+                />
+              </div>
+            ) : (
+              <>
             {/* Document Title Input Field Layer */}
             <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
               <label style={modalInputLabel}>DOCUMENT TITLE</label>
@@ -504,15 +634,34 @@ const handleSubmit = () => {
               </label>
             </div>
 
+            {editingNote?.attachments?.length > 0 && (
+              <div style={attachmentsRow}>
+                {editingNote.attachments.map((att) => (
+                  <a key={att.id} href={att.dataUrl} download={att.name} style={attachmentChip}>
+                    {att.name}
+                  </a>
+                ))}
+              </div>
+            )}
+
             {/* Direct Save Action Submission */}
             <div style={formActionFooter}>
               <button onClick={() => setIsModalOpen(false)} style={{ ...actionBtn, background: "#e5e7eb", color: "#374151" }}>Discard</button>
               <button onClick={handleSubmit} style={{ ...actionBtn, background: "#4f46e5", color: "white", padding: "12px 32px" }}>Commit Changes</button>
             </div>
+              </>
+            )}
 
           </div>
         </div>
       )}
+
+      <PdfImportModal
+        isOpen={isPdfImportOpen}
+        onClose={() => setIsPdfImportOpen(false)}
+        folders={folders.map((f) => ({ id: f.id, title: f.title }))}
+        onConfirm={handlePdfImportConfirm}
+      />
     </div>
   );
 }
@@ -559,3 +708,8 @@ const editorModalTextarea = { width: "100%", minHeight: "220px", padding: "16px"
 const metaSettingsRow = { display: "flex", gap: "20px", alignItems: "flex-end", background: "#f8fafc", padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0" };
 const checkboxSettingWrapper = { display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", flex: 1, userSelect: "none" };
 const formActionFooter = { display: "flex", gap: "12px", justifyContent: "flex-end", marginTop: "10px", borderTop: "1px solid #e2e8f0", paddingTop: "16px" };
+const modalViewToggle = { display: "flex", background: "#e5e7eb", borderRadius: "8px", padding: "3px" };
+const modalViewBtn = { border: "none", background: "transparent", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", color: "#6b7280" };
+const modalViewBtnActive = { background: "#fff", color: "#111827", boxShadow: "0 1px 2px rgba(0,0,0,0.06)" };
+const attachmentsRow = { display: "flex", flexWrap: "wrap", gap: "8px" };
+const attachmentChip = { fontSize: "12px", color: "#4f46e5", background: "#eef2ff", padding: "6px 10px", borderRadius: "8px", textDecoration: "none" };
