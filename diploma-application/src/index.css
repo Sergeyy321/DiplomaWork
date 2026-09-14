@@ -1,13 +1,191 @@
+:root {
+  --notion-bg: #ffffff;
+  --notion-sidebar: #f7f7f5;
+  --notion-card: #ffffff;
+  --notion-plate: #f7f7f5;
+  --notion-text: #37352f;
+  --notion-secondary: #787774;
+  --notion-placeholder: #9b9a97;
+  --notion-border: #edece9;
+  --notion-hover: rgba(55, 53, 47, 0.06);
+  --notion-active: rgba(55, 53, 47, 0.08);
+  --notion-font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif;
+  --notion-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"],
+body.dark-theme,
+.dark-theme {
+  --notion-bg: #121214;
+  --notion-sidebar: #18181b;
+  --notion-card: #202024;
+  --notion-plate: #26262b;
+  --notion-text: #f4f4f5;
+  --notion-secondary: #a1a1aa;
+  --notion-placeholder: #71717a;
+  --notion-border: #2e2e34;
+  --notion-hover: rgba(255, 255, 255, 0.08);
+  --notion-active: rgba(255, 255, 255, 0.14);
+  --notion-card-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  background-color: #121214 !important;
+  color: #f4f4f5 !important;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--notion-font);
+  color: var(--notion-text);
+  background-color: var(--notion-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+/* ===========================================================
+   react-calendar Ultra-Clear Dark & Light Theme System
+   =========================================================== */
+.react-calendar {
+  width: 100% !important;
+  background: var(--notion-card, #ffffff) !important;
+  border: 1px solid var(--notion-border, #edece9) !important;
+  border-radius: 8px !important;
+  font-family: inherit !important;
+  color: var(--notion-text, #37352f) !important;
+  box-shadow: none !important;
+}
+
+.react-calendar__navigation {
+  background: var(--notion-card, #ffffff) !important;
+  border-bottom: 1px solid var(--notion-border, #edece9) !important;
+  margin-bottom: 0 !important;
+  height: 46px !important;
+}
+
+.react-calendar__navigation button {
+  color: var(--notion-text, #37352f) !important;
+  min-width: 40px !important;
+  background: transparent !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  transition: background 0.12s ease !important;
+}
+
+.react-calendar__navigation button:hover,
+.react-calendar__navigation button:focus {
+  background: var(--notion-hover, rgba(255, 255, 255, 0.08)) !important;
+}
+
+.react-calendar__navigation button:disabled {
+  background: transparent !important;
+  color: var(--notion-placeholder, #71717a) !important;
+}
+
+.react-calendar__month-view__weekdays {
+  background: var(--notion-sidebar, #f7f7f5) !important;
+  border-bottom: 1px solid var(--notion-border, #edece9) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  color: var(--notion-secondary, #787774) !important;
+  padding: 8px 0 !important;
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none !important;
+  color: var(--notion-secondary, #787774) !important;
+}
+
+.react-calendar__month-view__days {
+  background: var(--notion-card, #ffffff) !important;
+}
+
+.react-calendar__tile {
+  background: var(--notion-card, #ffffff) !important;
+  color: var(--notion-text, #37352f) !important;
+  border-right: 1px solid var(--notion-border, #edece9) !important;
+  border-bottom: 1px solid var(--notion-border, #edece9) !important;
+  padding: 8px 6px !important;
+  min-height: 86px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  transition: background 0.12s ease !important;
+  position: relative !important;
+}
+
+.react-calendar__tile:hover {
+  background: var(--notion-hover, rgba(255, 255, 255, 0.06)) !important;
+}
+
+.react-calendar__tile--now {
+  background: rgba(99, 102, 241, 0.08) !important;
+  font-weight: 700 !important;
+}
+
+.react-calendar__tile--now abbr {
+  color: #3b82f6 !important;
+  font-weight: 700 !important;
+}
+
+.react-calendar__tile--active,
+.react-calendar__tile--active:hover {
+  background: rgba(99, 102, 241, 0.22) !important;
+  color: var(--notion-text, #f4f4f5) !important;
+}
+
+.react-calendar__month-view__days__day--neighboringMonth {
+  color: var(--notion-placeholder, #71717a) !important;
+  opacity: 0.35 !important;
+}
+
+/* Explicit Dark Mode Overrides for Calendar Plates */
+[data-theme="dark"] .react-calendar,
+body.dark-theme .react-calendar {
+  background: #19191d !important;
+  border-color: #2c2c34 !important;
+}
+
+[data-theme="dark"] .react-calendar__navigation,
+body.dark-theme .react-calendar__navigation {
+  background: #19191d !important;
+  border-bottom-color: #2c2c34 !important;
+}
+
+[data-theme="dark"] .react-calendar__month-view__weekdays,
+body.dark-theme .react-calendar__month-view__weekdays {
+  background: #141417 !important;
+  border-bottom-color: #2c2c34 !important;
+}
+
+[data-theme="dark"] .react-calendar__month-view__days,
+body.dark-theme .react-calendar__month-view__days {
+  background: #19191d !important;
+}
+
+[data-theme="dark"] .react-calendar__tile,
+body.dark-theme .react-calendar__tile {
+  background: #1c1c21 !important;
+  color: #f4f4f5 !important;
+  border-right-color: #282830 !important;
+  border-bottom-color: #282830 !important;
+}
+
+[data-theme="dark"] .react-calendar__tile:hover,
+body.dark-theme .react-calendar__tile:hover {
+  background: #25252d !important;
+}
+
+[data-theme="dark"] .react-calendar__tile--now,
+body.dark-theme .react-calendar__tile--now {
+  background: #1d2538 !important;
+}
+
+[data-theme="dark"] .react-calendar__tile--active,
+body.dark-theme .react-calendar__tile--active {
+  background: #2d365f !important;
+  color: #ffffff !important;
 }

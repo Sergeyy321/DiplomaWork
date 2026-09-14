@@ -1,0 +1,493 @@
+/* RichMediaViewer.css */
+.rich-media-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 14px;
+  width: 100%;
+}
+
+.rich-media-container.is-compact {
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.rich-media-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--notion-plate, #f9f9f8);
+  border: 1px solid var(--notion-border, #e5e5e5);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.rich-media-section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--notion-secondary, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Videos */
+.rich-media-video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.rich-media-video-card {
+  background: var(--notion-card, #ffffff);
+  border: 1px solid var(--notion-border, #e5e5e5);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.rich-media-video-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+  background: #000;
+}
+
+.rich-media-iframe,
+.rich-media-native-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.rich-media-video-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.rich-media-video-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.rich-media-video-tag {
+  font-size: 9px;
+  font-weight: 700;
+  background: #ef4444;
+  color: #ffffff;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.rich-media-video-name {
+  font-weight: 500;
+  color: var(--notion-text, #1f2937);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Images */
+.rich-media-image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.rich-media-image-card {
+  background: var(--notion-card, #ffffff);
+  border: 1px solid var(--notion-border, #e5e5e5);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.rich-media-image-thumb-wrap {
+  position: relative;
+  width: 100%;
+  height: 100px;
+  background: #f3f4f6;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.rich-media-image-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.rich-media-image-thumb-wrap:hover .rich-media-image-thumb {
+  transform: scale(1.05);
+}
+
+.rich-media-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.rich-media-image-thumb-wrap:hover .rich-media-image-overlay {
+  opacity: 1;
+}
+
+.rich-media-image-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.rich-media-file-name {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--notion-text, #1f2937);
+}
+
+.rich-media-file-size {
+  color: var(--notion-secondary, #9ca3af);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+/* PDFs */
+.rich-media-pdf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+}
+
+.rich-media-pdf-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--notion-card, #ffffff);
+  border: 1px solid var(--notion-border, #e5e5e5);
+  border-radius: 8px;
+  padding: 10px;
+  position: relative;
+}
+
+.rich-media-pdf-icon-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 48px;
+  background: rgba(239, 68, 68, 0.08);
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.rich-media-pdf-badge {
+  font-size: 8px;
+  font-weight: 800;
+  color: #dc2626;
+  margin-top: 1px;
+}
+
+.rich-media-pdf-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.rich-media-pdf-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--notion-text, #1f2937);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rich-media-pdf-meta {
+  font-size: 11px;
+  color: var(--notion-secondary, #6b7280);
+}
+
+.rich-media-pdf-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rich-media-btn-view,
+.rich-media-btn-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--notion-border, #d1d5db);
+  background: var(--notion-plate, #f3f4f6);
+  color: var(--notion-text, #374151);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.rich-media-btn-view:hover,
+.rich-media-btn-download:hover {
+  background: #e5e7eb;
+}
+
+/* Audio */
+.rich-media-audio-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rich-media-audio-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--notion-card, #ffffff);
+  border: 1px solid var(--notion-border, #e5e5e5);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.rich-media-audio-icon {
+  width: 32px;
+  height: 32px;
+  background: rgba(124, 58, 237, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rich-media-audio-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.rich-media-audio-name {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.rich-media-audio-element {
+  width: 100%;
+  height: 32px;
+}
+
+/* Generic files */
+.rich-media-file-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+.rich-media-file-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--notion-card, #ffffff);
+  border: 1px solid var(--notion-border, #e5e5e5);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.rich-media-file-info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.rich-media-file-title {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rich-media-file-sub {
+  font-size: 10px;
+  color: var(--notion-secondary, #9ca3af);
+}
+
+.rich-media-file-download {
+  color: var(--notion-secondary, #6b7280);
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.rich-media-file-download:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.rich-media-remove-btn {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+
+.rich-media-remove-btn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Lightbox Modal */
+.rich-lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(6px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.rich-lightbox-modal {
+  background: #18181b;
+  color: #f4f4f5;
+  border-radius: 12px;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+.rich-lightbox-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rich-lightbox-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.rich-lightbox-size {
+  color: #a1a1aa;
+  font-size: 11px;
+}
+
+.rich-lightbox-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rich-lightbox-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f4f4f5;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.rich-lightbox-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.rich-lightbox-btn.rich-lightbox-close:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+.rich-lightbox-body {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  max-height: calc(90vh - 60px);
+}
+
+.rich-lightbox-img {
+  max-width: 100%;
+  max-height: 75vh;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+  border-radius: 4px;
+}
+
+/* PDF Modal */
+.rich-pdf-modal {
+  background: #18181b;
+  color: #f4f4f5;
+  border-radius: 12px;
+  width: 85vw;
+  height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.rich-pdf-body {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.rich-pdf-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}

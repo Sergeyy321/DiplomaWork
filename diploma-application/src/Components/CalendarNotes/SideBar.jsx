@@ -4,7 +4,7 @@ export default function Sidebar({ folders, activeFolder, setActiveFolder, onCrea
   return (
     <div style={{ width: "250px", background: "#1e1e24", color: "#fff", padding: "20px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
       <div>
-        <h3 style={{ marginUp: 0, opacity: 0.6, fontSize: "12px", textTransform: "uppercase" }}>Папки</h3>
+        <h3 style={{ marginUp: 0, opacity: 0.6, fontSize: "12px", textTransform: "uppercase" }}>Folders</h3>
         <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "15px" }}>
           {folders.map(folder => (
             <div 

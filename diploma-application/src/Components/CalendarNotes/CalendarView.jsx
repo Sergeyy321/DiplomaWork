@@ -8,6 +8,7 @@ export default function CalendarView({ date, setDate, events }) {
       <Calendar
         onChange={setDate}
         value={date}
+        locale="en-US"
         tileContent={({ date: tileDate }) => {
           const currentDayStr = tileDate.toISOString().split("T")[0];
           const dayEvents = events.filter(e => e.date === currentDayStr);

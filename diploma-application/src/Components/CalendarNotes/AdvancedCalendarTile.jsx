@@ -1,4 +1,5 @@
 import React from "react";
+import { formatLocalDate } from "../../utils/dateUtils";
 
 export default function AdvancedCalendarTile({ 
   tileDate, 
@@ -6,7 +7,7 @@ export default function AdvancedCalendarTile({
   setSelectedEvent, 
   setIsPreviewOpen 
 }) {
-  const dateStr = tileDate.toISOString().split("T")[0];
+  const dateStr = formatLocalDate(tileDate);
 
   const handleDragStart = (e, eventId) => {
     e.stopPropagation();
@@ -17,59 +18,80 @@ export default function AdvancedCalendarTile({
   return (
     <div style={tileWrapper} data-date={dateStr}>
       <div style={tileNotesScrollArea}>
-        {dayEvents.map((event) => (
-          <div
-            key={event.id}
-            draggable
-            onDragStart={(e) => handleDragStart(e, event.id)}
-            onClick={(e) => {
-              e.stopPropagation(); // Opens your single unified component modal window securely
-              setSelectedEvent(event);
-              setIsPreviewOpen(true);
-            }}
-            style={{
-              ...premiumLegacyBadge,
-              borderLeft: `5px solid ${event.color}`, // Matches the high-density color accent bar exactly
-            }}
-            title="Drag note to reschedule"
-          >
-            <span style={{ 
-              ...badgeText, 
-              fontFamily: event.fontStyle || "sans-serif",
-              fontWeight: event.isBold ? "700" : "600", // Dynamically supports bold weight state tags
-              fontStyle: event.isItalic ? "italic" : "normal"
-            }}>
-              {event.title}
-            </span>
-          </div>
-        ))}
+        {dayEvents.map((event) => {
+          const isDone = event.status === "done";
+          return (
+            <div
+              key={event.id}
+              draggable
+              onDragStart={(e) => handleDragStart(e, event.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedEvent(event);
+                setIsPreviewOpen(true);
+              }}
+              style={{
+                ...notionCalendarTag,
+                borderLeft: "3px solid " + (event.color || "#37352f"),
+                opacity: isDone ? 0.75 : 1,
+              }}
+              title={"Drag note to reschedule • " + (isDone ? "Completed" : "Active")}
+            >
+              <span style={{ 
+                ...badgeText, 
+                fontFamily: event.fontStyle || "inherit",
+                fontWeight: event.isBold ? "600" : "500",
+                fontStyle: event.isItalic ? "italic" : "normal",
+                textDecoration: isDone ? "line-through" : "none",
+                color: isDone ? "var(--notion-placeholder, #9b9a97)" : "var(--notion-text, #37352f)",
+              }}>
+                {isDone && <span style={{ marginRight: 3, color: "#10b981", textDecoration: "none" }}>✓</span>}
+                {event.title}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-// ==========================================
-// 🎨 ORIGINAL CORE PREMIUM DESIGN STYLES
-// ==========================================
-const tileWrapper = { display: "flex", flexDirection: "column", height: "100%", width: "100%", justifyContent: "flex-start", minHeight: "85px", padding: "4px", boxSizing: "border-box", position: "relative" };
-const tileNotesScrollArea = { display: "flex", flexDirection: "column", gap: "5px", overflowY: "auto", maxHeight: "90px", width: "100%" };
+const tileWrapper = {
+  display: "flex",
+  flexDirection: "column",
+  height: "100%",
+  width: "100%",
+  justifyContent: "flex-start",
+  minHeight: "75px",
+  padding: "2px",
+  boxSizing: "border-box",
+  position: "relative",
+};
 
-// Rebuilt exactly from the original "Diploma Project Defense Planning" token metrics
-const premiumLegacyBadge = {
-  fontSize: "10px",
-  borderRadius: "6px",
-  padding: "2px 3px",
+const tileNotesScrollArea = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "3px",
+  overflowY: "auto",
+  maxHeight: "80px",
+  width: "100%",
+  marginTop: "2px",
+};
+
+const notionCalendarTag = {
+  fontSize: "11px",
+  borderRadius: "4px",
+  padding: "2px 5px",
   display: "flex",
   alignItems: "center",
-  background: "#ffffff", // Pure white card texture canvas background
-  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02)", // Premium soft spatial card shadows
+  background: "var(--notion-plate, var(--notion-sidebar, #f7f7f5))",
+  border: "1px solid var(--notion-border, #edece9)",
   cursor: "grab",
   zIndex: 10,
-  border: "1px solid #e5e7eb", // Framed card grid borders boundary
-  transition: "all 0.15s ease",
-  marginBottom: "2px",
+  transition: "background 0.12s ease",
+  marginBottom: "1px",
   width: "100%",
-  boxSizing: "border-box"
+  boxSizing: "border-box",
 };
 
 const badgeText = { 
@@ -78,6 +100,6 @@ const badgeText = {
   textOverflow: "ellipsis", 
   whiteSpace: "nowrap", 
   textAlign: "left", 
-  color: "#111827", // Distinct deep text coloring profile
-  pointerEvents: "none" 
+  pointerEvents: "none", 
+  lineHeight: "1.3",
 };

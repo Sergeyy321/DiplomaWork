@@ -13,8 +13,8 @@ const SUBCATEGORY_MODES = [
 ];
 
 const FOLDER_MODES = [
-  { id: "existing", label: "Existing workspace" },
-  { id: "new", label: "Create workspace" },
+  { id: "existing", label: "Existing category" },
+  { id: "new", label: "Create category" },
 ];
 
 export default function PdfImportModal({ isOpen, onClose, folders, onConfirm }) {

@@ -1,0 +1,1518 @@
+/* ==========================================================================
+   🌳 TREE OF KNOWLEDGE (ANCIENT OAK 10-SLOT INTERACTIVE CANVAS)
+   ========================================================================== */
+
+.tree-canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 120px);
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at 50% 40%, var(--notion-bg, #ffffff) 0%, var(--notion-sidebar, #f7f7f5) 100%);
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Header Bar */
+.tree-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--notion-card, #ffffff);
+  border-bottom: 1px solid var(--notion-border, #edece9);
+  z-index: 10;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  flex-shrink: 0;
+}
+
+.tree-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tree-main-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--notion-text, #37352f);
+  margin: 0;
+}
+
+.tree-slots-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.tree-species-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--notion-plate, #f1f1ef);
+  color: var(--notion-text, #37352f);
+  border: 1px solid var(--notion-border, #edece9);
+}
+
+.tree-breadcrumb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--notion-plate, #f1f1ef);
+  color: var(--notion-text, #37352f);
+  border: 1px solid var(--notion-border, #edece9);
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tree-breadcrumb-btn:hover {
+  background: var(--notion-border, #edece9);
+  transform: translateX(-2px);
+}
+
+.tree-category-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  max-width: 65%;
+  padding-bottom: 2px;
+}
+
+.tree-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--notion-plate, #f1f1ef);
+  color: var(--notion-text, #37352f);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.tree-pill:hover {
+  background: var(--notion-border, #edece9);
+}
+
+.tree-pill.is-active {
+  background: var(--notion-text, #37352f);
+  color: var(--notion-bg, #ffffff);
+}
+
+.tree-pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tree-pill--add {
+  border: 1px dashed #10b981;
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+
+.tree-pill--add:hover {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: #059669;
+}
+
+.tree-customize-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.tree-customize-trigger-btn:hover,
+.tree-customize-trigger-btn.is-active {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+}
+
+/* ==========================================================================
+   🌳 MAIN LAYOUT & LEFT SIDEBAR CUSTOMIZER
+   ========================================================================== */
+.tree-main-layout {
+  display: flex;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+}
+
+.tree-customizer-sidebar {
+  width: 320px;
+  min-width: 290px;
+  max-width: 340px;
+  height: 100%;
+  background: var(--notion-card, #ffffff);
+  border-right: 1px solid var(--notion-border, #edece9);
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+  box-shadow: 4px 0 18px rgba(0, 0, 0, 0.06);
+  animation: tree-slide-right 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+@keyframes tree-slide-right {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.tree-customizer-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--notion-border, #edece9);
+  background: var(--notion-sidebar, #fafaf9);
+}
+
+.tree-customizer-icon-badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tree-customizer-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--notion-text, #37352f);
+  margin: 0;
+}
+
+.tree-customizer-sub {
+  font-size: 10px;
+  color: var(--notion-secondary, #787774);
+  margin: 1px 0 0;
+}
+
+.tree-sidebar-close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--notion-secondary, #787774);
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s ease;
+}
+
+.tree-sidebar-close-btn:hover {
+  background: var(--notion-plate, #f1f1ef);
+  color: var(--notion-text, #37352f);
+}
+
+/* Customizer Tabs */
+.tree-customizer-tabs {
+  display: flex;
+  background: var(--notion-plate, #f1f1ef);
+  padding: 3px 6px;
+  gap: 3px;
+  border-bottom: 1px solid var(--notion-border, #edece9);
+}
+
+.tree-custom-tab-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 5px 4px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--notion-secondary, #787774);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  white-space: nowrap;
+}
+
+.tree-custom-tab-btn:hover {
+  color: var(--notion-text, #37352f);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.tree-custom-tab-btn.is-active {
+  color: var(--notion-text, #37352f);
+  background: var(--notion-card, #ffffff);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Sidebar Body */
+.tree-customizer-sidebar-body {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Sidebar Footer */
+.tree-customizer-sidebar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-top: 1px solid var(--notion-border, #edece9);
+  background: var(--notion-sidebar, #fafaf9);
+}
+
+/* Species & Palette Cards */
+.tree-species-grid,
+.tree-canopy-grid,
+.tree-trunk-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tree-species-card,
+.tree-palette-card,
+.tree-trunk-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 11px;
+  border-radius: 8px;
+  border: 1.5px solid var(--notion-border, #edece9);
+  background: var(--notion-card, #ffffff);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tree-species-card:hover,
+.tree-palette-card:hover,
+.tree-trunk-card:hover {
+  border-color: #10b981;
+  transform: translateY(-1px);
+}
+
+.tree-species-card.is-selected,
+.tree-palette-card.is-selected,
+.tree-trunk-card.is-selected {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+  box-shadow: 0 0 0 1px #10b981;
+}
+
+.tree-species-icon-wrap {
+  font-size: 20px;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.tree-species-info {
+  flex: 1;
+}
+
+.tree-species-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tree-species-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--notion-text, #37352f);
+}
+
+.tree-species-desc {
+  font-size: 10.5px;
+  color: var(--notion-secondary, #787774);
+  margin: 2px 0 0;
+  line-height: 1.3;
+}
+
+.tree-selected-check {
+  color: #10b981;
+}
+
+.tree-palette-swatches,
+.tree-trunk-preview-strip {
+  display: flex;
+  height: 14px;
+  border-radius: 5px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.tree-swatch-bar,
+.tree-trunk-wood-bar {
+  flex: 1;
+  height: 100%;
+}
+
+.tree-palette-info,
+.tree-trunk-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.tree-palette-name,
+.tree-trunk-name {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--notion-text, #37352f);
+}
+
+/* Effects List */
+.tree-effects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tree-effect-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--notion-plate, #f7f7f5);
+  border: 1px solid var(--notion-border, #edece9);
+}
+
+.tree-effect-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--notion-text, #37352f);
+  margin: 0;
+}
+
+.tree-effect-desc {
+  font-size: 10px;
+  color: var(--notion-secondary, #787774);
+  margin: 1px 0 0;
+}
+
+.tree-toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.tree-toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.tree-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #cbd5e1;
+  transition: 0.2s;
+  border-radius: 20px;
+}
+
+.tree-toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.2s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.tree-toggle-switch input:checked + .tree-toggle-slider {
+  background-color: #10b981;
+}
+
+.tree-toggle-switch input:checked + .tree-toggle-slider:before {
+  transform: translateX(16px);
+}
+
+/* ==========================================================================
+   🌳 VIEWPORT & INTERACTIVE CANVAS (TREE MODE)
+   ========================================================================== */
+.tree-viewport {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.tree-viewport.is-panning {
+  cursor: grabbing;
+}
+
+.tree-world {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.macro-tree-container {
+  position: absolute;
+  width: 1120px;
+  height: 960px;
+  left: -560px;
+  top: -480px;
+}
+
+.tree-svg-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tree-branch-path {
+  fill: none;
+  stroke: #78350f;
+  stroke-linecap: round;
+  transition: d 0.4s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.25s ease, stroke-width 0.25s ease;
+}
+
+.tree-branch-path.is-empty-slot {
+  stroke: #94a3b8;
+  opacity: 0.6;
+}
+
+.tree-branch-path.is-hovered {
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+/* Interactive Bough Nodes */
+.tree-bough-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1), top 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.tree-bough-node:hover {
+  transform: translate(-50%, -50%) scale(1.06);
+  z-index: 8;
+}
+
+.tree-foliage-cloud {
+  background: var(--notion-card, #ffffff);
+  border: 2px solid #10b981;
+  border-radius: 14px;
+  padding: 9px 13px;
+  min-width: 140px;
+  max-width: 170px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08), inset 0 1px 4px rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.tree-bough-header-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.tree-bough-leaves-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #059669;
+  background: rgba(16, 185, 129, 0.12);
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+
+.tree-prune-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s ease;
+}
+
+.tree-prune-btn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.tree-bough-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tree-bough-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tree-bough-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--notion-text, #37352f);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tree-bough-dive-hint {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--notion-secondary, #787774);
+  margin-top: 4px;
+  opacity: 0.8;
+}
+
+.tree-mini-leaf {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 10px 0 10px 0;
+  pointer-events: none;
+  opacity: 0.85;
+  animation: tree-leaf-sway 3s ease-in-out infinite alternate;
+}
+
+@keyframes tree-leaf-sway {
+  from {
+    transform: rotate(-10deg);
+  }
+  to {
+    transform: rotate(15deg);
+  }
+}
+
+/* Empty Sprout Slot */
+.tree-empty-slot-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 4;
+  transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1), top 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.tree-empty-slot-node:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  z-index: 7;
+}
+
+.tree-sprout-bud {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  background: var(--notion-card, #ffffff);
+  border: 1.5px dashed #94a3b8;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.tree-empty-slot-node:hover .tree-sprout-bud {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.2);
+}
+
+.tree-sprout-icon-wrap {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tree-sprout-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--notion-text, #37352f);
+}
+
+/* Trunk Plaque */
+.tree-trunk-plaque {
+  position: absolute;
+  top: calc(50% + 150px);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--notion-card, #ffffff);
+  border: 1.5px solid var(--notion-border, #edece9);
+  padding: 8px 16px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  pointer-events: none;
+  z-index: 6;
+}
+
+.tree-trunk-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--notion-text, #37352f);
+}
+
+.tree-trunk-sub {
+  font-size: 10px;
+  color: var(--notion-secondary, #787774);
+  margin-top: 2px;
+}
+
+/* Hanging Note Leaves on Branches (Tree Mode) */
+.tree-bough-leaf-notes-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  width: 100%;
+}
+
+.tree-branch-leaf-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--notion-card, #ffffff);
+  border: 1px solid var(--notion-border, #e2e8f0);
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 11px;
+  color: var(--notion-text, #334155);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  backdrop-filter: blur(4px);
+  width: 100%;
+  max-width: 170px;
+  box-sizing: border-box;
+}
+
+.tree-branch-leaf-chip:hover {
+  background: var(--notion-hover, #f8fafc);
+  border-color: #10b981;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.15);
+}
+
+.tree-leaf-chip-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+  text-align: left;
+}
+
+.tree-branch-leaf-more {
+  font-size: 10px;
+  font-weight: 600;
+  color: #10b981;
+  text-align: center;
+  padding: 1px 4px;
+  cursor: pointer;
+}
+
+.tree-branch-leaf-more:hover {
+  text-decoration: underline;
+}
+
+.tree-branch-quick-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 4px;
+  width: 100%;
+  max-width: 170px;
+  padding: 3px 6px;
+  border-radius: 6px;
+  border: 1px dashed var(--notion-border, #cbd5e1);
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--notion-secondary, #64748b);
+  font-size: 10.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tree-branch-quick-add-btn:hover {
+  border-color: #10b981;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+}
+
+/* ==========================================================================
+   🌿 CENTERED BRANCH DETAIL VIEW (TOPIC NOTES & LEAVES)
+   ========================================================================== */
+.tree-branch-detail-container {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 20px 60px;
+  background: radial-gradient(circle at 50% 20%, var(--notion-bg, #ffffff) 0%, var(--notion-sidebar, #f7f7f5) 100%);
+  animation: tree-detail-fade 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+@keyframes tree-detail-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tree-branch-detail-inner {
+  width: 100%;
+  max-width: 980px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.tree-detail-hero-card {
+  width: 100%;
+  background: var(--notion-card, #ffffff);
+  border: 1.5px solid var(--notion-border, #edece9);
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+.tree-detail-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tree-detail-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tree-detail-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tree-detail-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--notion-text, #37352f);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.tree-detail-subtitle {
+  font-size: 11px;
+  color: var(--notion-secondary, #787774);
+  margin: 2px 0 0;
+}
+
+.tree-detail-count {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #059669;
+  background: rgba(16, 185, 129, 0.12);
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.tree-detail-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tree-detail-back-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--notion-plate, #f1f1ef);
+  color: var(--notion-text, #37352f);
+  border: 1px solid var(--notion-border, #edece9);
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tree-detail-back-pill:hover {
+  background: var(--notion-border, #edece9);
+  transform: translateX(-2px);
+}
+
+.deep-leaf-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #10b981;
+  color: #ffffff;
+  border: none;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.deep-leaf-add-btn:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+/* Detail Filter Bar */
+.tree-detail-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--notion-border, #edece9);
+}
+
+.tree-status-filter-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tree-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--notion-plate, #f1f1ef);
+  color: var(--notion-text, #37352f);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tree-filter-pill:hover {
+  background: var(--notion-border, #edece9);
+}
+
+.tree-filter-count-badge {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.tree-detail-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--notion-plate, #f1f1ef);
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--notion-border, #edece9);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tree-detail-search-wrap:focus-within {
+  border-color: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.12);
+  background: var(--notion-card, #ffffff);
+}
+
+.tree-detail-search-wrap input {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 12.5px;
+  color: var(--notion-text, #37352f);
+  width: 170px;
+}
+
+.tree-search-clear-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--notion-secondary, #9ca3af);
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tree-search-clear-btn:hover {
+  color: var(--notion-text, #37352f);
+}
+
+/* Centered Notes Grid */
+.deep-leaf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  width: 100%;
+  justify-content: center;
+}
+
+.deep-leaf-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 24px;
+  background: var(--notion-card, #ffffff);
+  border-radius: 16px;
+  border: 1.5px dashed var(--notion-border, #edece9);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+}
+
+.deep-leaf-empty-icon {
+  font-size: 42px;
+  margin-bottom: 12px;
+}
+
+.deep-leaf-empty h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--notion-text, #37352f);
+  margin: 0 0 6px;
+}
+
+.deep-leaf-empty p {
+  font-size: 13px;
+  color: var(--notion-secondary, #787774);
+  margin: 0 0 18px;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.deep-leaf-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #10b981;
+  color: #ffffff;
+  border: none;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.deep-leaf-empty-btn:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+/* Note Leaf Card */
+.note-leaf-card {
+  background: var(--notion-card, #ffffff);
+  border: 1.5px solid var(--notion-border, #edece9);
+  border-radius: 14px;
+  padding: 16px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  position: relative;
+  box-sizing: border-box;
+}
+
+.note-leaf-card:hover {
+  border-color: #10b981;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
+}
+
+.note-leaf-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.note-leaf-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.note-leaf-status:hover {
+  filter: brightness(0.95);
+  transform: scale(1.02);
+}
+
+.note-leaf-status--todo {
+  background: rgba(107, 114, 128, 0.12);
+  color: #4b5563;
+}
+
+.note-leaf-status--progress {
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+}
+
+.note-leaf-status--done {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+
+.note-leaf-reminder-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.note-leaf-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--notion-text, #37352f);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.note-leaf-snippet {
+  font-size: 12.5px;
+  color: var(--notion-secondary, #787774);
+  line-height: 1.45;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.note-leaf-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--notion-border, #edece9);
+  font-size: 11px;
+  color: var(--notion-secondary, #787774);
+}
+
+.note-leaf-date,
+.note-leaf-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.note-leaf-open-hint {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  color: #10b981;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.note-leaf-card:hover .note-leaf-open-hint {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+/* ==========================================================================
+   🌳 FLOATING TOOLBAR
+   ========================================================================== */
+.tree-floating-toolbar {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--notion-card, #ffffff);
+  border: 1px solid var(--notion-border, #edece9);
+  padding: 4px 6px;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.tree-tool-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--notion-text, #37352f);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  transition: all 0.12s ease;
+}
+
+.tree-tool-btn:hover {
+  background: var(--notion-plate, #f1f1ef);
+}
+
+.tree-tool-btn--wide {
+  padding: 6px 10px;
+}
+
+.tree-tool-btn--customize.is-active {
+  background: rgba(16, 185, 129, 0.15);
+}
+
+/* ==========================================================================
+   🌳 GROW TOPIC MODAL
+   ========================================================================== */
+.tree-grow-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  animation: tree-fade-in 0.18s ease;
+}
+
+@keyframes tree-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.tree-grow-modal-card {
+  background: var(--notion-card, #ffffff);
+  border: 1px solid var(--notion-border, #edece9);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: tree-scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tree-scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.tree-grow-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--notion-border, #edece9);
+  background: var(--notion-sidebar, #fafaf9);
+}
+
+.tree-grow-icon-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tree-grow-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--notion-text, #37352f);
+  margin: 0;
+}
+
+.tree-grow-sub {
+  font-size: 11px;
+  color: var(--notion-secondary, #787774);
+  margin: 2px 0 0;
+}
+
+.tree-modal-close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--notion-secondary, #787774);
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.tree-modal-close-btn:hover {
+  background: var(--notion-plate, #f1f1ef);
+  color: var(--notion-text, #37352f);
+}
+
+.tree-grow-form {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tree-grow-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tree-grow-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--notion-text, #37352f);
+}
+
+.tree-grow-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid var(--notion-border, #edece9);
+  border-radius: 8px;
+  background: var(--notion-card, #ffffff);
+  color: var(--notion-text, #37352f);
+  font-size: 13px;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.tree-grow-input:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+}
+
+.tree-grow-palette {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tree-grow-swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.tree-grow-swatch:hover {
+  transform: scale(1.15);
+}
+
+.tree-grow-swatch.is-selected {
+  outline: 2.5px solid #10b981;
+  outline-offset: 2px;
+}
+
+.tree-grow-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.tree-grow-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tree-grow-btn--cancel {
+  background: var(--notion-plate, #f1f1ef);
+  color: var(--notion-text, #37352f);
+  border: 1px solid var(--notion-border, #edece9);
+}
+
+.tree-grow-btn--cancel:hover {
+  background: var(--notion-border, #edece9);
+}
+
+.tree-grow-btn--confirm {
+  background: #10b981;
+  color: #ffffff;
+  border: none;
+}
+
+.tree-grow-btn--confirm:hover:not(:disabled) {
+  background: #059669;
+}
+
+.tree-grow-btn--confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tree-growth-header-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tree-trunk-growth-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 4px 0 2px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #059669;
+}
+
+.tree-growth-icon {
+  font-size: 12px;
+}
+
+.tree-growth-done {
+  font-weight: 500;
+  color: var(--notion-secondary, #787774);
+}

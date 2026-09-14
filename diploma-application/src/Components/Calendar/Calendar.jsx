@@ -119,7 +119,7 @@
 //             <h3>New event</h3>
 
 //             <input
-//               placeholder="Название"
+//               placeholder="Title"
 //               value={form.title}
 //               onChange={(e) =>
 //                 setForm({ ...form, title: e.target.value })

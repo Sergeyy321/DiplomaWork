@@ -1,7 +1,8 @@
 const { GoogleGenAI } = require("@google/genai");
+const { safeJsonParse } = require("./gemini");
 
-const PRIMARY_MODEL = process.env.GEMINI_MODEL || "gemini-3.1-flash";
-const FALLBACK_MODELS = ["gemini-2.5-flash", "gemini-2.0-flash"];
+const PRIMARY_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const FALLBACK_MODELS = ["gemini-1.5-flash", "gemini-2.0-flash"];
 
 function getClient() {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -67,25 +68,49 @@ async function generateFromPdf(ai, pdfBase64, prompt, config) {
   throw lastError || new Error("Failed to analyze PDF.");
 }
 
+function localServerImportPdfNote({ fileName, folders }) {
+  const rawName = fileName || "Imported Document";
+  const cleanTitle = rawName
+    .replace(/\.pdf$/i, "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+
+  return {
+    title: cleanTitle,
+    content: `<p>Imported document: <strong>${rawName}</strong></p><p>Document file attached for reference and study.</p>`,
+    summary: `Imported PDF: ${rawName}`,
+    placement: {
+      folderAction: "existing",
+      folderId: folders?.[0]?.id || "work",
+      subcategoryAction: "none",
+      reasoning: "Placed in current workspace with original PDF attached.",
+      confidence: "high",
+    },
+    fileName: rawName,
+    model: "Local Server Fallback",
+  };
+}
+
 async function importPdfNote({ pdfBase64, fileName, folders, subcategoriesByTopic }) {
-  const ai = getClient();
+  try {
+    const ai = getClient();
 
-  const folderList = (folders || [])
-    .map((f) => `- id: "${f.id}", title: "${f.title}"`)
-    .join("\n");
+    const folderList = (folders || [])
+      .map((f) => `- id: "${f.id}", title: "${f.title}"`)
+      .join("\n");
 
-  const subcategoryList = Object.entries(subcategoriesByTopic || {})
-    .map(([topicId, subs]) => {
-      const topic = (folders || []).find((f) => f.id === topicId);
-      const topicLabel = topic?.title || topicId;
-      const items = (subs || [])
-        .map((s) => `    - id: "${s.id}", title: "${s.title}"`)
-        .join("\n");
-      return `  Topic "${topicLabel}" (${topicId}):\n${items || "    (none)"}`;
-    })
-    .join("\n");
+    const subcategoryList = Object.entries(subcategoriesByTopic || {})
+      .map(([topicId, subs]) => {
+        const topic = (folders || []).find((f) => f.id === topicId);
+        const topicLabel = topic?.title || topicId;
+        const items = (subs || [])
+          .map((s) => `    - id: "${s.id}", title: "${s.title}"`)
+          .join("\n");
+        return `  Topic "${topicLabel}" (${topicId}):\n${items || "    (none)"}`;
+      })
+      .join("\n");
 
-  const prompt = `You are an intelligent note importer for a student notes app. The user uploaded a PDF (filename: "${fileName}").
+    const prompt = `You are an intelligent note importer for a student notes app. The user uploaded a PDF (filename: "${fileName}").
 
 Read the PDF and create a structured study note from it.
 
@@ -111,13 +136,17 @@ Rules:
 
 Pick the best matching workspace and subcategory when possible. For lecture notes, exams, or teacher materials, prefer creating a subject-specific subcategory if none exists.`;
 
-  const { text, model } = await generateFromPdf(ai, pdfBase64, prompt, {
-    responseMimeType: "application/json",
-    responseSchema: IMPORT_SCHEMA,
-    temperature: 0.3,
-  });
+    const { text, model } = await generateFromPdf(ai, pdfBase64, prompt, {
+      responseMimeType: "application/json",
+      responseSchema: IMPORT_SCHEMA,
+      temperature: 0.3,
+    });
 
-  return { ...JSON.parse(text), model, fileName };
+    return { ...safeJsonParse(text), model, fileName };
+  } catch (err) {
+    console.warn("[pdf-import] Falling back to local PDF note structure:", err.message);
+    return localServerImportPdfNote({ fileName, folders });
+  }
 }
 
 module.exports = { importPdfNote };

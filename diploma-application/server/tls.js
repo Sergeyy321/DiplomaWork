@@ -20,10 +20,10 @@ function configureTls() {
         connect: { rejectUnauthorized: false },
       })
     );
-    console.warn("[tls] Dev mode: relaxed TLS verification for Gemini API calls");
+    console.warn("[tls] Dev mode: relaxed TLS verification for AI API calls");
   } catch {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-    console.warn("[tls] Dev mode: NODE_TLS_REJECT_UNAUTHORIZED=0 for Gemini API calls");
+    console.warn("[tls] Dev mode: NODE_TLS_REJECT_UNAUTHORIZED=0 for AI API calls");
   }
 }
 

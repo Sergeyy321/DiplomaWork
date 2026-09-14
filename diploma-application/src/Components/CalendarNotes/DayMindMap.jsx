@@ -1,11 +1,11 @@
 import React from "react";
 
 export default function DayMindMap({ date, events }) {
-  const formattedDate = date.toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
+  const formattedDate = date.toLocaleDateString("en-US", { day: "numeric", month: "short" });
 
   return (
     <div style={{ width: "350px", background: "#fff", padding: "20px", borderRadius: "12px", boxShadow: "0 4px 6px rgba(0,0,0,0.05)", display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
-      <h3 style={{ marginTop: 0, width: "100%", textAlign: "left" }}>Майнд-карта дня</h3>
+      <h3 style={{ marginTop: 0, width: "100%", textAlign: "left" }}>Day Mind Map</h3>
       
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", width: "100%" }}>
    
@@ -44,7 +44,7 @@ export default function DayMindMap({ date, events }) {
 
    
         {events.length === 0 && (
-          <p style={{ position: "absolute", color: "#9ca3af", fontSize: "14px" }}>На сегодня заметок нет</p>
+          <p style={{ position: "absolute", color: "#9ca3af", fontSize: "14px" }}>No notes for today</p>
         )}
       </div>
     </div>

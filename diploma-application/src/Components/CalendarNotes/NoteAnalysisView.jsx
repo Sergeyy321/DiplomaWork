@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   FileText,
   ListChecks,
@@ -57,8 +57,15 @@ export default function NoteAnalysisView({ note, onSaveAnalysis, compact = false
   const [chatMessages, setChatMessages] = useState([]);
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
+  const chatBottomRef = useRef(null);
 
   const step = STEPS[stepIndex];
+
+  useEffect(() => {
+    if (step.id === "ask") {
+      chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages, chatLoading, step.id]);
 
   useEffect(() => {
     checkAiHealth()
@@ -161,9 +168,15 @@ export default function NoteAnalysisView({ note, onSaveAnalysis, compact = false
   return (
     <div className={`nav-analysis ${compact ? "nav-analysis--compact" : ""}`}>
       {serverOk === false && (
-        <div className="nav-analysis__alert">
-          <AlertCircle size={16} />
-          AI server offline — run <code>npm run server</code>
+        <div className="nav-analysis__alert" style={{ background: "#f7f7f5", borderColor: "#edece9", color: "#787774" }}>
+          <Sparkles size={14} color="#37352f" />
+          Offline Analysis Engine active (Add DEEPSEEK_API_KEY in .env for DeepSeek model)
+        </div>
+      )}
+      {serverOk === true && (
+        <div className="nav-analysis__alert" style={{ background: "#fdfdfc", borderColor: "#edece9", color: "#37352f" }}>
+          <Sparkles size={14} color="#2383e2" />
+          DeepSeek AI Model Connected
         </div>
       )}
 
@@ -188,7 +201,7 @@ export default function NoteAnalysisView({ note, onSaveAnalysis, compact = false
               </button>
             ))}
           </div>
-          <button type="button" className="nav-analysis__start" disabled={!serverOk} onClick={runAnalysis}>
+          <button type="button" className="nav-analysis__start" onClick={runAnalysis}>
             Start analysis
           </button>
         </div>
@@ -309,6 +322,7 @@ export default function NoteAnalysisView({ note, onSaveAnalysis, compact = false
                       Thinking...
                     </div>
                   )}
+                  <div ref={chatBottomRef} />
                 </div>
                 <div className="nav-chat-starters">
                   {CHAT_STARTERS.map((s) => (

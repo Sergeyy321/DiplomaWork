@@ -6,8 +6,8 @@ const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
 
-const { analyzeNote, chatAboutNote } = require("./gemini");
-const { importPdfNote } = require("./pdfImport");
+const { analyzeNote, chatAboutNote } = require("./deepseek");
+const { importPdfNote } = require("./deepseekPdfImport");
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -27,8 +27,8 @@ app.use(express.json({ limit: "1mb" }));
 app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
-    model: process.env.GEMINI_MODEL || "gemini-3.1-flash-lite",
-    hasKey: Boolean(process.env.GEMINI_API_KEY),
+    model: process.env.DEEPSEEK_MODEL || "deepseek-chat",
+    hasKey: Boolean(process.env.DEEPSEEK_API_KEY || process.env.OPENAI_API_KEY),
   });
 });
 
@@ -100,12 +100,32 @@ app.post("/api/import-pdf", upload.single("file"), async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`AI server: http://localhost:${PORT}`);
-}).on("error", (err) => {
-  if (err.code === "EADDRINUSE") {
-    console.error(`Port ${PORT} is already in use. Kill the existing process or set PORT=3002 in .env`);
-    process.exit(1);
+// Centralized error handling for Multer and request errors (Bug 2.1)
+app.use((err, _req, res, _next) => {
+  console.error("[server error]", err);
+  if (err instanceof multer.MulterError) {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({ error: "File too large. Maximum size is 15MB." });
+    }
+    return res.status(400).json({ error: err.message });
   }
-  throw err;
+  res.status(err.status || 400).json({
+    error: err.message || "An unexpected error occurred on the server.",
+  });
+});
+
+const server = app.listen(PORT, () => {
+  console.log(`DeepSeek AI server running at: http://localhost:${PORT}`);
+});
+
+server.on("error", (err) => {
+  if (err.code === "EADDRINUSE") {
+    console.error(`\n⚠️ Port ${PORT} is already in use by an existing node process.`);
+    console.error(`To free up port ${PORT}, run:`);
+    console.error(`  npx kill-port ${PORT}`);
+    console.error(`Or close any duplicate terminal running the server.\n`);
+    process.exit(1);
+  } else {
+    console.error("[Server Error]", err);
+  }
 });
