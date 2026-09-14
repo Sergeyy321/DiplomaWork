@@ -1,0 +1,562 @@
+/* ===========================================================
+   Notion-Style Single Unified Mind Map Canvas
+   =========================================================== */
+.notion-mindmap-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  height: calc(100vh - 120px);
+  min-height: 520px;
+  flex: 1;
+  position: relative;
+}
+
+.notion-mindmap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.notion-mindmap-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--notion-text, #37352f);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notion-mindmap-canvas {
+  flex: 1;
+  position: relative;
+  min-height: 540px;
+  background:
+    radial-gradient(var(--notion-border, #e3e2e0) 1px, transparent 1px),
+    var(--notion-card, #fafaf9);
+  background-size: 20px 20px;
+  border: 1px solid var(--notion-border, #edece9);
+  border-radius: 10px;
+  overflow: hidden;
+  user-select: none;
+  cursor: grab;
+}
+
+.notion-mindmap-canvas.is-panning {
+  cursor: grabbing;
+}
+
+.notion-mindmap-world {
+  position: absolute;
+  inset: 0;
+  transform-origin: center center;
+}
+
+.notion-mindmap-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 2px;
+  background: var(--notion-border, rgba(55, 53, 47, 0.25));
+  transform-origin: 0 0;
+  z-index: 1;
+  pointer-events: none;
+  transition: height 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+[data-theme="dark"] .notion-mindmap-line,
+body.dark-theme .notion-mindmap-line {
+  background: rgba(129, 140, 248, 0.7) !important;
+  box-shadow: 0 0 6px rgba(129, 140, 248, 0.45);
+}
+
+.notion-mindmap-line.is-dragging,
+.notion-mindmap-line.is-focused {
+  height: 3px;
+  z-index: 25;
+  background: #6366f1 !important;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.8) !important;
+}
+
+[data-theme="dark"] .notion-mindmap-line.is-dragging,
+body.dark-theme .notion-mindmap-line.is-dragging {
+  background: #a5b4fc !important;
+  box-shadow: 0 0 14px rgba(165, 180, 252, 0.95) !important;
+}
+
+.notion-mindmap-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: #37352f;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 10;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  cursor: grab;
+  user-select: none;
+  transition: box-shadow 0.12s ease;
+}
+
+.notion-mindmap-center:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+}
+
+.notion-mindmap-center.is-dragging {
+  cursor: grabbing;
+  z-index: 26;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.notion-mindmap-center-label {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.notion-mindmap-center-val {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-top: 2px;
+}
+
+.notion-mindmap-center-title {
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.85;
+  margin-top: 2px;
+  max-width: 90px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notion-mindmap-node {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 5;
+  background: var(--notion-card, #ffffff);
+  border: 1px solid var(--notion-border, #edece9);
+  border-left: 3px solid var(--notion-accent, #2383e2);
+  color: var(--notion-text, #37352f);
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  cursor: grab;
+  min-width: 160px;
+  max-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.notion-mindmap-node:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.notion-mindmap-node.is-dragging {
+  cursor: grabbing;
+  z-index: 25;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.notion-mindmap-node.is-focused {
+  border-color: #2383e2 !important;
+  box-shadow: 0 0 0 3px rgba(35, 131, 226, 0.3), 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  animation: pulse-node 1.5s ease infinite alternate;
+}
+
+@keyframes pulse-node {
+  from {
+    transform: translate(calc(-50% + 0px), calc(-50% + 0px)) scale(1);
+  }
+  to {
+    transform: translate(calc(-50% + 0px), calc(-50% + 0px)) scale(1.04);
+  }
+}
+
+.notion-mindmap-node.is-completed {
+  opacity: 0.85;
+  background: #fdfdfc;
+}
+
+.notion-mindmap-node-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--notion-secondary, #787774);
+  font-weight: 500;
+}
+
+.notion-mindmap-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.notion-mindmap-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 9px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: opacity 0.12s, transform 0.12s;
+  user-select: none;
+}
+
+.notion-mindmap-status-pill:hover {
+  opacity: 0.85;
+  transform: scale(1.02);
+}
+
+.status-pill--todo {
+  background: #f7f7f5;
+  color: #787774;
+  border-color: #edece9;
+}
+
+.status-pill--progress {
+  background: #fef3c7;
+  color: #b45309;
+  border-color: #fde68a;
+}
+
+.status-pill--done {
+  background: #d1fae5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+
+.notion-mindmap-jump-btn {
+  background: transparent;
+  border: 1px solid var(--notion-border, #edece9);
+  color: var(--notion-secondary, #787774);
+  border-radius: 3px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.12s, color 0.12s;
+}
+
+.notion-mindmap-jump-btn:hover {
+  background: #ebebea;
+  color: var(--notion-text, #37352f);
+}
+
+.notion-mindmap-node-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--notion-text, #37352f);
+  margin: 0;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.notion-mindmap-node-title.is-done-text {
+  text-decoration: line-through;
+  color: #9b9a97;
+}
+
+.notion-mindmap-node-snippet {
+  font-size: 11px;
+  color: var(--notion-secondary, #787774);
+  line-height: 1.3;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.notion-mindmap-toolbar {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--notion-card, #ffffff);
+  border: 1px solid var(--notion-border, #edece9);
+  border-radius: 6px;
+  padding: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.notion-mindmap-tool-btn {
+  border: 1px solid var(--notion-border, #edece9);
+  background: var(--notion-sidebar, #f7f7f5);
+  color: var(--notion-text, #37352f);
+  border-radius: 4px;
+  width: 26px;
+  height: 26px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s;
+}
+
+.notion-mindmap-tool-btn:hover {
+  background: var(--notion-border, #ebebea);
+}
+
+.notion-mindmap-tool-btn--wide {
+  width: auto;
+  padding: 0 8px;
+  font-size: 11px;
+}
+
+.notion-mindmap-empty {
+  position: absolute;
+  top: calc(50% + 80px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 12;
+  text-align: center;
+  max-width: 320px;
+  color: var(--notion-secondary, #787774);
+  background: var(--notion-card, #ffffff);
+  border: 1px solid var(--notion-border, #edece9);
+  border-radius: 8px;
+  padding: 14px 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.notion-mindmap-empty h4 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--notion-text, #37352f);
+}
+
+.notion-mindmap-empty p {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.notion-mindmap-create-btn {
+  background: #37352f;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   MIND MAP PHYSICAL NOTE SHAPES & SHAPE SELECTOR MENU
+   ========================================================================== */
+
+.notion-mindmap-shape-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--notion-plate, #f1f1ef);
+  color: var(--notion-secondary, #787774);
+  border: 1px solid var(--notion-border, #edece9);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.notion-mindmap-shape-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--notion-plate, #f1f1ef);
+  color: var(--notion-text, #37352f);
+  border: 1px solid var(--notion-border, #edece9);
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.notion-mindmap-shape-toggle-btn:hover {
+  background: var(--notion-border, #edece9);
+}
+
+.notion-mindmap-shape-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 220px;
+  background: var(--notion-card, #ffffff);
+  border: 1px solid var(--notion-border, #edece9);
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  padding: 6px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  animation: tree-fade-in 0.15s ease-out;
+}
+
+.notion-mindmap-shape-menu-header {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--notion-secondary, #787774);
+  padding: 4px 8px 6px;
+  border-bottom: 1px solid var(--notion-border, #edece9);
+  margin-bottom: 3px;
+}
+
+.notion-mindmap-shape-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--notion-text, #37352f);
+  transition: background 0.12s;
+}
+
+.notion-mindmap-shape-item:hover {
+  background: var(--notion-plate, #f1f1ef);
+}
+
+.notion-mindmap-shape-item.is-selected {
+  background: rgba(35, 131, 226, 0.08);
+}
+
+/* --- STRUCTURAL SHAPES --- */
+
+/* 1. Card (Default) */
+.notion-mindmap-node--card {
+  border-radius: 8px;
+  border-left-width: 3px;
+}
+
+/* 2. Capsule / Pill */
+.notion-mindmap-node--pill {
+  border-radius: 9999px !important;
+  border-left: 1px solid var(--notion-border, #edece9) !important;
+  border-top-width: 3px !important;
+  padding: 10px 20px !important;
+  min-width: 175px !important;
+  max-width: 235px !important;
+  align-items: center;
+  text-align: center;
+}
+
+.notion-mindmap-node--pill .notion-mindmap-node-header {
+  width: 100%;
+  justify-content: center;
+  gap: 8px;
+}
+
+.notion-mindmap-node--pill .notion-mindmap-node-title {
+  text-align: center;
+}
+
+.notion-mindmap-node--pill .notion-mindmap-node-snippet {
+  text-align: center;
+}
+
+/* 3. Hexagon */
+.notion-mindmap-node--hexagon {
+  clip-path: polygon(14% 0%, 86% 0%, 100% 50%, 86% 100%, 14% 100%, 0% 50%);
+  border-radius: 0 !important;
+  border-left: none !important;
+  padding: 14px 26px !important;
+  min-width: 185px !important;
+  max-width: 245px !important;
+  align-items: center;
+  text-align: center;
+  background: var(--notion-card, #ffffff);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.notion-mindmap-node--hexagon .notion-mindmap-node-header {
+  width: 100%;
+  justify-content: center;
+}
+
+.notion-mindmap-node--hexagon .notion-mindmap-node-title,
+.notion-mindmap-node--hexagon .notion-mindmap-node-snippet {
+  text-align: center;
+}
+
+/* 4. Diamond Badge */
+.notion-mindmap-node--diamond {
+  clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 18px 100%, 0 50%);
+  border-radius: 0 !important;
+  border-left: none !important;
+  padding: 12px 24px !important;
+  min-width: 180px !important;
+  max-width: 240px !important;
+  align-items: center;
+  text-align: center;
+}
+
+.notion-mindmap-node--diamond .notion-mindmap-node-header {
+  width: 100%;
+  justify-content: center;
+}
+
+.notion-mindmap-node--diamond .notion-mindmap-node-title,
+.notion-mindmap-node--diamond .notion-mindmap-node-snippet {
+  text-align: center;
+}
+
+/* 5. Thought Bubble / Cloud */
+.notion-mindmap-node--bubble {
+  border-radius: 22px 22px 22px 4px !important;
+  border-left-width: 3px !important;
+  padding: 11px 15px !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+}
+
+/* 6. Cyber / Tech Badge (Cut Corners) */
+.notion-mindmap-node--badge {
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  border-radius: 0 !important;
+  border-left-width: 4px !important;
+  padding: 10px 16px !important;
+  min-width: 170px !important;
+  max-width: 240px !important;
+}

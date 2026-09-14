@@ -1,0 +1,38 @@
+.pdf-import-backdrop { position: fixed; inset: 0; z-index: 1200; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; padding: 24px; }
+.pdf-import-modal { width: min(540px,100%); max-height: min(90vh,760px); background: #ffffff; border-radius: 10px; border: 1px solid #edece9; box-shadow: 0 16px 40px rgba(0,0,0,0.12); display: flex; flex-direction: column; overflow: hidden; font-family: var(--notion-font); }
+.pdf-import-header { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 16px 20px; border-bottom: 1px solid #edece9; }
+.pdf-import-header__title { display: flex; gap: 10px; color: #37352f; }
+.pdf-import-header__title h2 { margin: 0; font-size: 15px; font-weight: 600; color: #37352f; }
+.pdf-import-header__title p { margin: 2px 0 0; font-size: 12px; color: #787774; }
+.pdf-import-close { border: 1px solid #edece9; background: #f7f7f5; color: #787774; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.pdf-import-close:hover { background: #ebebea; color: #37352f; }
+.pdf-import-dropzone { margin: 20px; padding: 40px 20px; border: 1.5px dashed #edece9; border-radius: 8px; text-align: center; cursor: pointer; background: #fafaf9; transition: border-color 0.12s, background 0.12s; }
+.pdf-import-dropzone:hover { border-color: #37352f; background: #f7f7f5; }
+.pdf-import-dropzone__title { margin: 10px 0 0; font-weight: 600; font-size: 13px; color: #37352f; }
+.pdf-import-processing { padding: 40px 20px; text-align: center; color: #37352f; }
+.pdf-import-spin { animation: pdfSpin 0.8s linear infinite; }
+@keyframes pdfSpin { to { transform: rotate(360deg); } }
+.pdf-import-review { padding: 0 20px 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+.pdf-import-suggestion { display: flex; gap: 8px; padding: 10px 12px; background: #f7f7f5; border: 1px solid #edece9; border-radius: 6px; font-size: 12px; color: #37352f; }
+.pdf-import-field { display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: 600; color: #787774; text-transform: uppercase; }
+.pdf-import-field input, .pdf-import-section select, .pdf-import-section input { padding: 8px 10px; border: 1px solid #edece9; border-radius: 6px; font-size: 13px; text-transform: none; color: #37352f; background: #ffffff; }
+.pdf-import-preview { max-height: 120px; overflow-y: auto; padding: 10px; border: 1px solid #edece9; border-radius: 6px; font-size: 13px; background: #fafaf9; color: #37352f; }
+.pdf-import-section h3 { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; font-size: 12px; color: #37352f; }
+.pdf-import-segment { display: flex; gap: 4px; padding: 3px; background: #f7f7f5; border: 1px solid #edece9; border-radius: 6px; margin-bottom: 8px; }
+.pdf-import-segment button { flex: 1; border: none; background: transparent; padding: 5px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; color: #787774; transition: background 0.12s; }
+.pdf-import-segment button.is-active { background: #ffffff; color: #37352f; box-shadow: 0 1px 2px rgba(0,0,0,0.04); font-weight: 600; }
+.pdf-import-attachment { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #fafaf9; border: 1px solid #edece9; border-radius: 6px; font-size: 12px; color: #37352f; }
+.pdf-import-attachment__tag { margin-left: auto; font-size: 10px; color: #15803d; background: #dcfce7; padding: 2px 6px; border-radius: 4px; }
+.pdf-import-error { margin: 0 20px; padding: 8px 12px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; color: #b91c1c; font-size: 12px; }
+.pdf-import-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 20px; border-top: 1px solid #edece9; }
+.pdf-import-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; }
+.pdf-import-btn--ghost { background: #f7f7f5; color: #37352f; border: 1px solid #edece9; }
+.pdf-import-btn--ghost:hover { background: #ebebea; }
+.pdf-import-btn--primary { background: #37352f; color: #ffffff; }
+.pdf-import-btn--primary:hover { background: #272520; }
+.pdf-import-sidebar-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 6px; padding: 8px; border: 1px dashed #edece9; border-radius: 6px; background: transparent; color: #787774; font-size: 12px; cursor: pointer; transition: background 0.12s, color 0.12s; }
+.pdf-import-sidebar-btn:hover { border-color: #37352f; color: #37352f; background: rgba(55,53,47,0.04); }
+.note-attachments { padding-top: 10px; border-top: 1px solid #edece9; margin-top: 10px; }
+.note-attachments__title { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: #787774; margin-bottom: 6px; }
+.note-attachment-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #f7f7f5; border: 1px solid #edece9; border-radius: 6px; font-size: 12px; color: #37352f; }
+.note-attachment-item a { margin-left: auto; color: #2563eb; text-decoration: none; font-size: 11px; }

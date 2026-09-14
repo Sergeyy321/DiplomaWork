@@ -1,0 +1,125 @@
+/* ==========================================================================
+   🚨 DELETE CONFIRMATION DOUBLE-CHECK MODAL
+   ========================================================================== */
+
+.notion-delete-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: delFadeIn 0.15s ease;
+}
+
+.notion-delete-confirm-card {
+  width: 390px;
+  max-width: 90vw;
+  background: var(--notion-card, #ffffff);
+  border: 1px solid var(--notion-border, #edece9);
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  animation: delSlideUp 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes delFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes delSlideUp {
+  from { transform: translateY(12px) scale(0.96); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.notion-delete-confirm-icon-badge {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+
+.notion-delete-confirm-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--notion-text, #37352f);
+  margin: 0;
+}
+
+.notion-delete-confirm-desc {
+  font-size: 12.5px;
+  color: var(--notion-secondary, #787774);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.notion-delete-confirm-desc strong {
+  color: var(--notion-text, #37352f);
+}
+
+.notion-delete-confirm-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.notion-delete-confirm-btn {
+  flex: 1;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.notion-delete-confirm-btn--cancel {
+  background: var(--notion-plate, #f1f1ef);
+  border: 1px solid var(--notion-border, #edece9);
+  color: var(--notion-text, #37352f);
+}
+
+.notion-delete-confirm-btn--cancel:hover {
+  background: var(--notion-border, #edece9);
+}
+
+.notion-delete-confirm-btn--danger {
+  background: #ef4444;
+  border: 1px solid #dc2626;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.notion-delete-confirm-btn--danger:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .notion-delete-confirm-card {
+  background: #1e1e24;
+  border-color: #2c2c36;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .notion-delete-confirm-desc strong {
+  color: #f4f4f5;
+}

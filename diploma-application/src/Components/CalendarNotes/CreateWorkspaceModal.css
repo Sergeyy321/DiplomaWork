@@ -1,0 +1,180 @@
+/* ===========================================================
+   Create Workspace Modal Styling
+   =========================================================== */
+.workspace-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1250;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.workspace-modal-panel {
+  width: min(440px, 100%);
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid var(--notion-border, #edece9);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: var(--notion-font);
+  animation: wsModalIn 0.15s ease-out;
+}
+
+@keyframes wsModalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.workspace-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--notion-border, #edece9);
+}
+
+.workspace-modal-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--notion-text, #37352f);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.workspace-modal-close {
+  border: 1px solid var(--notion-border, #edece9);
+  background: var(--notion-sidebar, #f7f7f5);
+  color: var(--notion-secondary, #787774);
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.workspace-modal-close:hover {
+  background: #ebebea;
+  color: var(--notion-text, #37352f);
+}
+
+.workspace-modal-form {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.workspace-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.workspace-modal-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--notion-secondary, #787774);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.workspace-modal-field input {
+  border: 1px solid var(--notion-border, #edece9);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--notion-text, #37352f);
+  outline: none;
+  background: #ffffff;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+.workspace-modal-field input:focus {
+  border-color: #37352f;
+  box-shadow: 0 0 0 1px #37352f;
+}
+
+.workspace-icon-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.workspace-icon-option {
+  border: 1px solid var(--notion-border, #edece9);
+  background: var(--notion-sidebar, #f7f7f5);
+  color: var(--notion-text, #37352f);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.workspace-icon-option:hover {
+  background: #ebebea;
+}
+
+.workspace-icon-option.is-selected {
+  border-color: #37352f;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px #37352f;
+  font-weight: 600;
+}
+
+.workspace-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--notion-border, #edece9);
+  background: #fafaf9;
+}
+
+.workspace-modal-btn {
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+}
+
+.workspace-modal-btn--ghost {
+  background: transparent;
+  color: var(--notion-text, #37352f);
+  border: 1px solid var(--notion-border, #edece9);
+}
+
+.workspace-modal-btn--ghost:hover {
+  background: var(--notion-sidebar, #f7f7f5);
+}
+
+.workspace-modal-btn--primary {
+  background: #37352f;
+  color: #ffffff;
+}
+
+.workspace-modal-btn--primary:hover {
+  background: #272520;
+}

@@ -1,0 +1,665 @@
+.note-editor-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.note-editor-panel {
+  width: min(960px, 100%);
+  height: min(90vh, 940px);
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.14);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+.note-editor-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 52px;
+  padding: 0 20px;
+  border-bottom: 1px solid #ebebea;
+  background: #ffffff;
+}
+
+.note-editor-topbar-left {
+  min-width: 0;
+  flex: 1;
+}
+
+.note-editor-view-toggle {
+  display: inline-flex;
+  padding: 3px;
+  background: #f1f1ef;
+  border-radius: 8px;
+  gap: 2px;
+}
+
+.note-editor-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #787774;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.note-editor-view-btn:hover {
+  color: #37352f;
+}
+
+.note-editor-view-btn.is-active {
+  background: #ffffff;
+  color: #37352f;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.note-editor-analysis {
+  flex: 1;
+  min-height: 0;
+  padding: 20px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.note-editor-path {
+  font-size: 13px;
+  color: #787774;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-editor-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.note-editor-link {
+  border: none;
+  background: none;
+  padding: 6px 8px;
+  font-size: 13px;
+  color: #787774;
+  cursor: pointer;
+}
+
+.note-editor-link:hover {
+  color: #37352f;
+}
+
+.note-editor-link--danger:hover {
+  color: #c0392b;
+}
+
+.note-editor-save {
+  border: none;
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #37352f;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.note-editor-save:hover {
+  background: #2f2f2f;
+}
+
+.note-editor-close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #787774;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.note-editor-close:hover {
+  background: #f1f1ef;
+  color: #37352f;
+}
+
+.note-editor-formatbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  border-bottom: 1px solid #ebebea;
+  background: #fafafa;
+  flex-wrap: wrap;
+}
+
+.note-editor-format {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #37352f;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.note-editor-format:hover {
+  background: #efefef;
+}
+
+.note-editor-format.is-active {
+  background: #e3e2e0;
+}
+
+.note-editor-format:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.note-editor-format--wide {
+  width: auto;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+.note-editor-format-divider {
+  width: 1px;
+  height: 18px;
+  background: #e3e2e0;
+  margin: 0 4px;
+}
+
+.note-editor-font-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #787774;
+}
+
+.note-editor-format-select {
+  border: 1px solid #e3e2e0;
+  background: #ffffff;
+  color: #37352f;
+  font-size: 13px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  min-width: 96px;
+}
+
+.note-editor-format-select--font {
+  min-width: 112px;
+}
+
+.note-editor-format-select:hover {
+  border-color: #d3d1cb;
+}
+
+.note-editor-swatch input {
+  width: 22px;
+  height: 22px;
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.note-editor-format-hint {
+  margin-left: auto;
+  font-size: 12px;
+  color: #9b9a97;
+}
+
+.note-editor-scroll {
+  flex: 1;
+  overflow-y: auto;
+  background: #ffffff;
+}
+
+.note-editor-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 56px 32px;
+}
+
+.note-editor-title {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 2.5rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #37352f;
+  margin: 0 0 24px;
+  padding: 0;
+}
+
+.note-editor-title::placeholder {
+  color: #c4c4c2;
+}
+
+.note-editor-content {
+  width: 100%;
+  min-height: 420px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  line-height: 1.65;
+  color: #37352f;
+  padding: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.note-editor-content:empty::before {
+  content: attr(data-placeholder);
+  color: #c4c4c2;
+  pointer-events: none;
+}
+
+.note-editor-content strong,
+.note-editor-content b {
+  font-weight: 600;
+}
+
+.note-editor-content em,
+.note-editor-content i {
+  font-style: italic;
+}
+
+.note-editor-footer {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  border-top: 1px solid #ebebea;
+  background: #fafafa;
+}
+
+.note-editor-time {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #787774;
+}
+
+.note-editor-time input {
+  border: 1px solid #e3e2e0;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  color: #37352f;
+  background: #ffffff;
+}
+
+.note-editor-time input:focus {
+  outline: 2px solid #2383e2;
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+@media (max-width: 768px) {
+  .note-editor-backdrop {
+    padding: 0;
+    align-items: stretch;
+  }
+
+  .note-editor-panel {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    border: none;
+  }
+
+  .note-editor-page {
+    padding: 32px 24px 24px;
+  }
+
+  .note-editor-title {
+    font-size: 2rem;
+  }
+}
+
+
+/* Attach Dropdown Menu */
+.note-editor-attach-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.note-editor-attach-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--notion-border, #d1d5db);
+  background: var(--notion-plate, #f3f4f6);
+  color: var(--notion-text, #374151);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.note-editor-attach-btn:hover,
+.note-editor-attach-btn.is-active {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+  color: #111827;
+}
+
+.note-editor-attach-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
+  background: var(--notion-card, #ffffff);
+  border: 1px solid var(--notion-border, #e5e5e5);
+  border-radius: 10px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  padding: 6px;
+  min-width: 250px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  animation: attachMenuPop 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes attachMenuPop {
+  from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.note-editor-attach-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+  width: 100%;
+}
+
+.note-editor-attach-menu-item:hover {
+  background: var(--notion-plate, #f3f4f6);
+}
+
+.note-editor-attach-menu-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.note-editor-attach-menu-text strong {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--notion-text, #1f2937);
+}
+
+.note-editor-attach-menu-text small {
+  font-size: 10px;
+  color: var(--notion-secondary, #6b7280);
+}
+
+/* Dedicated Interactive Drop Zone */
+.note-editor-dropzone {
+  margin-top: 12px;
+  margin-bottom: 8px;
+  border: 1.5px dashed var(--notion-border, #cbd5e1);
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: var(--notion-plate, #f8fafc);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.note-editor-dropzone:hover {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.04);
+}
+
+.note-editor-dropzone-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.note-editor-dropzone-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.note-editor-dropzone-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.note-editor-dropzone-text strong {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--notion-text, #334155);
+}
+
+.note-editor-dropzone-text span {
+  font-size: 10.5px;
+  color: var(--notion-secondary, #64748b);
+}
+
+/* Drag & Drop Overlay Zone */
+.note-editor-panel.is-dragging-files {
+  border: 2px dashed #4f46e5 !important;
+  box-shadow: 0 0 25px rgba(79, 70, 229, 0.35) !important;
+}
+
+.note-editor-drag-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(79, 70, 229, 0.12);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+}
+
+.note-editor-drag-box {
+  background: var(--notion-card, #ffffff);
+  border: 2px dashed #4f46e5;
+  border-radius: 12px;
+  padding: 30px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+}
+
+.note-editor-drag-box h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #4f46e5;
+}
+
+.note-editor-drag-box p {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Toast */
+.note-editor-toast {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #18181b;
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 10000;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+  animation: toastFade 0.2s ease;
+}
+
+@keyframes toastFade {
+  from { opacity: 0; transform: translate(-50%, -8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Video Modal */
+.note-video-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.note-video-modal {
+  background: var(--notion-card, #ffffff);
+  border: 1px solid var(--notion-border, #e5e5e5);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.note-video-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--notion-border, #e5e5e5);
+  font-size: 13px;
+}
+
+.note-video-modal-close {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+}
+
+.note-video-modal-close:hover {
+  color: #111827;
+}
+
+.note-video-modal-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.note-video-modal-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--notion-secondary, #6b7280);
+}
+
+.note-video-modal-input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--notion-border, #d1d5db);
+  background: var(--notion-plate, #f9f9f8);
+  color: var(--notion-text, #1f2937);
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.note-video-modal-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  background: #ffffff;
+}
+
+.note-video-modal-error {
+  font-size: 11px;
+  color: #dc2626;
+}
+
+.note-video-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.note-video-modal-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.note-video-modal-btn.secondary {
+  background: var(--notion-plate, #f3f4f6);
+  color: var(--notion-text, #374151);
+}
+
+.note-video-modal-btn.primary {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.note-video-modal-btn.primary:hover {
+  background: #dc2626;
+}

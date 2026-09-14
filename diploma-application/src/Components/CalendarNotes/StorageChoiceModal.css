@@ -1,0 +1,466 @@
+/* ===========================================================
+   🗄️ STORAGE & CLOUD CHOICE MODAL (IndexedDB & Google Drive)
+   =========================================================== */
+
+.storage-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: storageFadeIn 0.2s ease-out;
+}
+
+@keyframes storageFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.storage-modal-card,
+.storage-modal-container {
+  background: #ffffff !important;
+  color: #1e293b;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 660px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e2e8f0;
+  box-sizing: border-box;
+}
+
+[data-theme="dark"] .storage-modal-card,
+[data-theme="dark"] .storage-modal-container,
+body.dark-theme .storage-modal-card,
+body.dark-theme .storage-modal-container {
+  background: #1f1f1f !important;
+  color: #f1f5f9;
+  border-color: #334155;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+}
+
+.storage-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+[data-theme="dark"] .storage-modal-header,
+body.dark-theme .storage-modal-header {
+  background: #181818;
+  border-bottom-color: #334155;
+}
+
+.storage-modal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.storage-icon-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(16, 185, 129, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.storage-modal-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+[data-theme="dark"] .storage-modal-title,
+body.dark-theme .storage-modal-title {
+  color: #f8fafc;
+}
+
+.storage-modal-sub {
+  margin: 3px 0 0;
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+[data-theme="dark"] .storage-modal-sub,
+body.dark-theme .storage-modal-sub {
+  color: #94a3b8;
+}
+
+.storage-close-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.storage-close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+[data-theme="dark"] .storage-close-btn:hover,
+body.dark-theme .storage-close-btn:hover {
+  background: #334155;
+  color: #f8fafc;
+}
+
+/* Status Banner */
+.storage-status-banner {
+  margin: 14px 24px 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.storage-status-banner--success {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.storage-status-banner--error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.storage-status-banner--info {
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+/* Quota Card */
+.storage-quota-card {
+  margin: 16px 24px 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+[data-theme="dark"] .storage-quota-card,
+body.dark-theme .storage-quota-card {
+  background: #181818;
+  border-color: #334155;
+}
+
+.storage-quota-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.storage-quota-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .storage-quota-track,
+body.dark-theme .storage-quota-track {
+  background: #334155;
+}
+
+.storage-quota-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+/* Options Grid */
+.storage-options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 16px 24px;
+}
+
+@media (max-width: 580px) {
+  .storage-options-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.storage-option-card {
+  border: 2px solid #e2e8f0;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 16px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  transition: all 0.15s ease;
+}
+
+[data-theme="dark"] .storage-option-card,
+body.dark-theme .storage-option-card {
+  background: #242424;
+  border-color: #334155;
+}
+
+.storage-option-card:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+}
+
+.storage-option-card.is-selected {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.storage-option-card.is-selected-cloud {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.04);
+}
+
+.storage-option-radio {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+}
+
+[data-theme="dark"] .storage-option-radio,
+body.dark-theme .storage-option-radio {
+  background: #1e1e1e;
+  border-color: #475569;
+}
+
+.storage-option-card.is-selected .storage-option-radio {
+  border-color: #10b981;
+  background: #10b981;
+  color: #ffffff;
+}
+
+.storage-option-card.is-selected-cloud .storage-option-radio {
+  border-color: #3b82f6;
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.storage-option-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.storage-option-icon--phone {
+  background: rgba(16, 185, 129, 0.15);
+}
+
+.storage-option-icon--cloud {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.storage-option-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.storage-option-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+[data-theme="dark"] .storage-option-title,
+body.dark-theme .storage-option-title {
+  color: #f8fafc;
+}
+
+.storage-option-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+
+.storage-option-badge--cloud {
+  background: rgba(59, 130, 246, 0.15);
+  color: #2563eb;
+}
+
+.storage-option-desc {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+[data-theme="dark"] .storage-option-desc,
+body.dark-theme .storage-option-desc {
+  color: #94a3b8;
+}
+
+/* Google Drive Account Card */
+.storage-gdrive-card {
+  margin: 0 24px 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+[data-theme="dark"] .storage-gdrive-card,
+body.dark-theme .storage-gdrive-card {
+  background: #181818;
+  border-color: #334155;
+}
+
+/* Official Google Sign-In Button */
+.storage-google-signin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #1e293b;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.15s ease;
+}
+
+.storage-google-signin-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="dark"] .storage-google-signin-btn,
+body.dark-theme .storage-google-signin-btn {
+  background: #2d2d2d;
+  color: #f8fafc;
+  border-color: #475569;
+}
+
+.storage-gdrive-sync-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 6px;
+  border: none;
+  background: #3b82f6;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.storage-gdrive-sync-btn:hover {
+  background: #2563eb;
+}
+
+.storage-gdrive-disconnect-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: transparent;
+  color: #ef4444;
+  cursor: pointer;
+}
+
+.storage-gdrive-disconnect-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Footer */
+.storage-modal-footer {
+  padding: 16px 24px 20px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+[data-theme="dark"] .storage-modal-footer,
+body.dark-theme .storage-modal-footer {
+  background: #181818;
+  border-top-color: #334155;
+}
+
+.storage-done-btn {
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: none;
+  background: #10b981;
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  transition: background 0.15s;
+}
+
+.storage-done-btn:hover {
+  background: #059669;
+}
+
+.spin-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

@@ -1,0 +1,374 @@
+.install-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: installFadeIn 0.25s ease-out;
+}
+
+@keyframes installFadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.install-modal-container {
+  background: var(--notion-card-bg, #ffffff);
+  color: var(--notion-text, #0f172a);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--notion-border, rgba(226, 232, 240, 0.8));
+}
+
+.install-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 22px 22px 16px;
+  border-bottom: 1px solid var(--notion-border, #f1f5f9);
+}
+
+.install-modal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.install-icon-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(124, 58, 237, 0.12));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.install-modal-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--notion-text, #0f172a);
+  letter-spacing: -0.02em;
+}
+
+.install-modal-subtitle {
+  margin: 4px 0 0;
+  font-size: 0.82rem;
+  color: var(--notion-secondary, #64748b);
+  line-height: 1.4;
+}
+
+.install-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--notion-secondary, #94a3b8);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.install-modal-close:hover {
+  background: var(--notion-hover, #f1f5f9);
+  color: var(--notion-text, #0f172a);
+}
+
+.install-content-body {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.install-standalone-banner {
+  margin: 24px;
+  padding: 20px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.install-standalone-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #059669;
+}
+
+.install-standalone-desc {
+  font-size: 0.82rem;
+  color: var(--notion-text, #334155);
+  margin-top: 4px;
+}
+
+.install-platform-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+
+.install-platform-badge.ios {
+  background: rgba(0, 122, 255, 0.12);
+  color: #007aff;
+}
+
+.install-platform-badge.android {
+  background: rgba(79, 70, 229, 0.12);
+  color: #4f46e5;
+}
+
+.install-ios-guide {
+  background: var(--notion-hover, #f8fafc);
+  border: 1px solid var(--notion-border, #e2e8f0);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.install-guide-heading {
+  margin: 0 0 12px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--notion-text, #0f172a);
+}
+
+.install-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.install-step-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--notion-card-bg, #ffffff);
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--notion-border, #e2e8f0);
+}
+
+.install-step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #007aff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.install-step-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.install-step-text {
+  font-size: 0.82rem;
+  color: var(--notion-text, #334155);
+  line-height: 1.35;
+}
+
+.install-step-text strong {
+  color: var(--notion-text, #0f172a);
+}
+
+.install-android-box {
+  background: var(--notion-hover, #f8fafc);
+  border: 1px solid var(--notion-border, #e2e8f0);
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.install-1tap-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.install-hero-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 8px 16px -4px rgba(79, 70, 229, 0.3);
+}
+
+.install-hero-info {
+  flex: 1;
+}
+
+.install-hero-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--notion-text, #0f172a);
+}
+
+.install-hero-desc {
+  font-size: 0.8rem;
+  color: var(--notion-secondary, #64748b);
+  margin-top: 2px;
+}
+
+.install-hero-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  background: #4f46e5;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+
+.install-hero-btn:hover:not(:disabled) {
+  background: #4338ca;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+}
+
+.install-hero-btn:disabled {
+  background: #10b981;
+  cursor: default;
+}
+
+.install-benefits-box {
+  background: var(--notion-bg, #ffffff);
+  border: 1px solid var(--notion-border, #e2e8f0);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.install-benefits-title {
+  margin: 0 0 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--notion-text, #0f172a);
+}
+
+.install-benefits-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .install-benefits-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.install-benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.install-benefit-item div {
+  display: flex;
+  flex-direction: column;
+}
+
+.install-benefit-item strong {
+  font-size: 0.8rem;
+  color: var(--notion-text, #0f172a);
+}
+
+.install-benefit-item span {
+  font-size: 0.72rem;
+  color: var(--notion-secondary, #64748b);
+  line-height: 1.3;
+}
+
+.install-modal-footer {
+  padding: 14px 22px;
+  border-top: 1px solid var(--notion-border, #f1f5f9);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.install-done-btn {
+  padding: 8px 20px;
+  border-radius: 10px;
+  background: var(--notion-hover, #f1f5f9);
+  color: var(--notion-text, #0f172a);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid var(--notion-border, #cbd5e1);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.install-done-btn:hover {
+  background: var(--notion-border, #e2e8f0);
+}
+
+/* Dark Theme */
+.dark-theme .install-modal-container {
+  background: #1e1e2e;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f8fafc;
+}
+.dark-theme .install-modal-header {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.dark-theme .install-ios-guide,
+.dark-theme .install-android-box {
+  background: #181825;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.dark-theme .install-step-item {
+  background: #252538;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.dark-theme .install-benefits-box {
+  background: #252538;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.dark-theme .install-done-btn {
+  background: #252538;
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.12);
+}

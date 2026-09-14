@@ -1,0 +1,800 @@
+/* ===========================================================
+   A2 Paper Format Mind Map Canvas & Paint Studio
+   =========================================================== */
+.a2-studio-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 650px;
+  background: var(--notion-bg, #f0f2f5);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--notion-border, #edece9);
+  font-family: var(--notion-font, sans-serif);
+}
+
+.a2-studio-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--notion-card, #ffffff);
+  border-bottom: 1px solid var(--notion-border, #edece9);
+  z-index: 30;
+}
+
+.a2-studio-toolbar-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.a2-studio-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--notion-text, #1f1e1d);
+}
+
+.a2-studio-zoom-badge {
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--notion-hover, #f1f1ef);
+  color: var(--notion-text-muted, #787774);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.a2-studio-subtitle {
+  font-size: 11px;
+  color: var(--notion-text-muted, #787774);
+}
+
+.a2-studio-toolbar-right {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Mode Switcher */
+.a2-mode-selector {
+  display: inline-flex;
+  background: var(--notion-hover, #f1f1ef);
+  border: 1px solid var(--notion-border, #e5e5e3);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.a2-mode-btn {
+  border: none;
+  background: transparent;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--notion-text-muted, #5f5e5b);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.12s ease;
+}
+
+.a2-mode-btn.is-active {
+  background: var(--notion-card, #ffffff);
+  color: var(--notion-text, #1f1e1d);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Zoom Controls */
+.a2-zoom-controls {
+  display: inline-flex;
+  align-items: center;
+  background: var(--notion-card, #f7f7f5);
+  border: 1px solid var(--notion-border, #edece9);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.a2-zoom-btn {
+  border: none;
+  background: transparent;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--notion-text-muted, #5f5e5b);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: background 0.12s, color 0.12s;
+}
+
+.a2-zoom-btn:hover {
+  background: var(--notion-hover, #ebebea);
+  color: var(--notion-text, #1f1e1d);
+}
+
+.a2-zoom-btn--center {
+  background: rgba(99, 102, 241, 0.08);
+  color: #6366f1;
+  font-weight: 600;
+}
+
+.a2-zoom-btn--center:hover {
+  background: rgba(99, 102, 241, 0.16);
+  color: #4f46e5;
+}
+
+.a2-palette-picker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--notion-card, #f7f7f5);
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--notion-border, #edece9);
+}
+
+.a2-palette-swatches {
+  display: flex;
+  gap: 5px;
+}
+
+.a2-palette-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid #d1d5db;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.a2-palette-swatch:hover {
+  transform: scale(1.15);
+}
+
+.a2-palette-swatch.is-active {
+  transform: scale(1.25);
+  border: 2px solid #37352f;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4);
+}
+
+.a2-studio-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.12s ease;
+}
+
+.a2-studio-btn--primary {
+  background: #37352f;
+  color: #ffffff;
+}
+
+.a2-studio-btn--primary:hover {
+  background: #1f1e1d;
+}
+
+.a2-studio-btn--accent {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.a2-studio-btn--accent:hover {
+  background: #1d4ed8;
+}
+
+/* Paint Sub-Toolbar */
+.a2-paint-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 18px;
+  background: var(--notion-card, #fafaf9);
+  border-bottom: 1px solid var(--notion-border, #edece9);
+  z-index: 25;
+  animation: a2BarSlideDown 0.15s ease-out;
+}
+
+@keyframes a2BarSlideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.a2-paint-tools-group {
+  display: flex;
+  gap: 6px;
+}
+
+.a2-paint-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  border: 1px solid var(--notion-border, #edece9);
+  background: var(--notion-card, #ffffff);
+  color: var(--notion-text-muted, #5f5e5b);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.a2-paint-tool-btn:hover {
+  background: var(--notion-hover, #f1f1ef);
+  color: var(--notion-text, #1f1e1d);
+  transform: translateY(-1px);
+}
+
+.a2-paint-tool-btn.is-active {
+  background: #37352f;
+  color: #ffffff;
+  border-color: #37352f;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.a2-paint-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--notion-border, #edece9);
+}
+
+.a2-paint-swatches {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.a2-paint-swatch {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
+}
+
+.a2-paint-swatch:hover {
+  transform: scale(1.2);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+}
+
+.a2-paint-swatch.is-active {
+  transform: scale(1.3);
+  box-shadow: 0 0 0 2.5px #37352f, 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.a2-brush-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.a2-brush-slider {
+  width: 80px;
+  cursor: pointer;
+  accent-color: #2563eb;
+}
+
+.a2-paint-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.a2-paint-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--notion-border, #edece9);
+  background: var(--notion-card, #ffffff);
+  color: var(--notion-text, #37352f);
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.a2-paint-action-btn:hover {
+  background: var(--notion-hover, #f1f1ef);
+}
+
+.a2-paint-action-btn--danger {
+  color: #ef4444;
+}
+
+.a2-paint-action-btn--danger:hover {
+  background: #fef2f2;
+}
+
+/* Canvas Viewport */
+.a2-canvas-viewport {
+  flex: 1;
+  overflow: auto;
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: var(--notion-bg, #e2e5e9);
+  scroll-behavior: smooth;
+}
+
+.a2-canvas-zoom-container {
+  display: flex;
+  justify-content: center;
+  margin: auto;
+  transition: transform 0.15s ease-out;
+}
+
+/* Printable Real A2 Sheet */
+.a2-printable-sheet {
+  position: relative;
+  border-radius: 14px;
+  border: 1px solid #edece9;
+  box-sizing: border-box;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.14);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.a2-canvas-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-size: 28px 28px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.a2-canvas-header {
+  position: absolute;
+  top: 14px;
+  left: 24px;
+  right: 24px;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+/* Radiating SVG Arrows */
+.a2-arrows-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* ===========================================================
+   DISTINCT GEOMETRIC SHAPES FOR TOPIC BLOCKS & CENTER HUB
+   =========================================================== */
+
+/* Center Hub Base */
+.a2-center-hub {
+  position: absolute;
+  border: 2px solid #edece9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  text-align: center;
+  box-sizing: border-box;
+  user-select: none;
+  transition: box-shadow 0.15s ease, border-radius 0.2s ease, clip-path 0.2s ease;
+  pointer-events: auto;
+}
+
+/* Center Hub Shapes */
+.a2-center-hub--shape-rounded {
+  border-radius: 24px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+}
+
+.a2-center-hub--shape-sharp {
+  border-radius: 0px;
+  box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.2);
+}
+
+.a2-center-hub--shape-hexagon {
+  border-radius: 0px;
+  clip-path: polygon(18px 0%, calc(100% - 18px) 0%, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0% calc(100% - 18px), 0% 18px);
+}
+
+.a2-center-hub--shape-pill {
+  border-radius: 999px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.a2-center-hub--shape-bubble {
+  border-radius: 32px 32px 32px 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.a2-center-hub--shape-badge {
+  clip-path: polygon(0% 0%, 100% 0%, 100% calc(100% - 20px), 50% 100%, 0% calc(100% - 20px));
+}
+
+.a2-center-hub--shape-organic {
+  border-radius: 44px 18px 52px 22px / 22px 52px 18px 44px;
+  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.12);
+}
+
+.a2-center-drag-bar {
+  position: absolute;
+  top: 6px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 0.7;
+  cursor: grab;
+}
+
+.a2-center-drag-bar:active {
+  cursor: grabbing;
+}
+
+.a2-shape-picker-btn {
+  background: transparent;
+  border: 1px solid var(--notion-border, #edece9);
+  border-radius: 4px;
+  padding: 2px 4px;
+  color: var(--notion-secondary, #787774);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.a2-shape-picker-btn:hover {
+  background: var(--notion-hover, #f1f1ef);
+  color: var(--notion-text, #1f1e1d);
+}
+
+.a2-shape-dropdown {
+  position: absolute;
+  top: 22px;
+  right: 0;
+  background: var(--notion-card, #ffffff);
+  border: 1px solid var(--notion-border, #edece9);
+  border-radius: 6px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.14);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 100;
+  min-width: 140px;
+}
+
+.a2-shape-opt {
+  border: none;
+  background: transparent;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  text-align: left;
+  cursor: pointer;
+  color: var(--notion-text, #37352f);
+}
+
+.a2-shape-opt:hover {
+  background: var(--notion-hover, #f1f1ef);
+}
+
+.a2-shape-opt.is-active {
+  background: #37352f;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.a2-center-title-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.12s;
+}
+
+.a2-center-title-display:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.a2-center-title-text {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.a2-center-edit-icon {
+  opacity: 0.5;
+}
+
+.a2-center-title-input {
+  font-size: 15px;
+  font-weight: 700;
+  border: 1px solid #6366f1;
+  border-radius: 5px;
+  padding: 4px 8px;
+  outline: none;
+  text-align: center;
+  width: 170px;
+  background: transparent;
+}
+
+.a2-center-edit-btn {
+  background: #6366f1;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  padding: 4px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.a2-center-subtag {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--notion-secondary, #787774);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+}
+
+/* Topic Card Base */
+.a2-sector-card {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+  user-select: none;
+  transition: box-shadow 0.15s ease, border-radius 0.2s ease, clip-path 0.2s ease;
+  pointer-events: auto;
+}
+
+/* Shape 1: Rounded (Modern Card) */
+.a2-shape--rounded {
+  border-radius: 16px;
+}
+
+/* Shape 2: Sharp (Blueprint Box) */
+.a2-shape--sharp {
+  border-radius: 0px;
+  box-shadow: 4px 4px 0px rgba(0,0,0,0.18) !important;
+}
+
+/* Shape 3: Hexagon (Chamfered Tech) */
+.a2-shape--hexagon {
+  border-radius: 0px;
+  clip-path: polygon(16px 0%, calc(100% - 16px) 0%, 100% 16px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 16px 100%, 0% calc(100% - 16px), 0% 16px);
+  padding: 16px 18px;
+}
+
+/* Shape 4: Pill (Capsule Stadium) */
+.a2-shape--pill {
+  border-radius: 40px;
+  padding: 14px 22px;
+}
+
+/* Shape 5: Bubble (Thought Bubble) */
+.a2-shape--bubble {
+  border-radius: 28px 28px 28px 4px;
+}
+
+/* Shape 6: Badge (Shield Crest) */
+.a2-shape--badge {
+  clip-path: polygon(0% 0%, 100% 0%, 100% calc(100% - 20px), 50% 100%, 0% calc(100% - 20px));
+  padding-bottom: 24px;
+}
+
+/* Shape 7: Organic (Flowing Cloud) */
+.a2-shape--organic {
+  border-radius: 38px 14px 46px 18px / 18px 46px 14px 38px;
+}
+
+.a2-card-drag-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: grab;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed rgba(0,0,0,0.06);
+}
+
+.a2-card-drag-bar:active {
+  cursor: grabbing;
+}
+
+.a2-card-del-btn {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+}
+
+.a2-card-del-btn:hover {
+  color: #ef4444;
+  background: #fee2e2;
+}
+
+.a2-sector-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.a2-sector-icon-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.a2-sector-title-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.a2-sector-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.a2-sector-count {
+  font-size: 11.5px;
+}
+
+.a2-sector-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.a2-sector-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 9px;
+  border-radius: 6px;
+  border: 1px solid #edece9;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.a2-sector-bullet {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.a2-sector-item-text {
+  flex: 1;
+  word-break: break-word;
+}
+
+.a2-sector-item-del {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  opacity: 0.5;
+  transition: opacity 0.12s, color 0.12s;
+}
+
+.a2-sector-item-del:hover {
+  opacity: 1;
+  color: #ef4444;
+}
+
+.a2-sector-add-row {
+  display: flex;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.a2-sector-add-input {
+  flex: 1;
+  border: 1px solid #edece9;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 11.5px;
+  outline: none;
+  font-family: inherit;
+  background: transparent;
+}
+
+.a2-sector-add-btn {
+  border: none;
+  color: #ffffff;
+  border-radius: 6px;
+  padding: 5px 9px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Resize Handle on bottom right */
+.a2-resize-handle {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 16px;
+  height: 16px;
+  cursor: se-resize;
+  background: transparent;
+  background-image: radial-gradient(circle, #787774 2px, transparent 2px);
+  background-size: 4px 4px;
+  opacity: 0.5;
+  transition: opacity 0.12s;
+  z-index: 5;
+}
+
+.a2-resize-handle:hover {
+  opacity: 1;
+}
+
+/* FREEHAND HTML5 PAINT CANVAS LAYER */
+.a2-paint-canvas-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.a2-paint-canvas-layer.is-active {
+  pointer-events: auto;
+  cursor: crosshair;
+}
